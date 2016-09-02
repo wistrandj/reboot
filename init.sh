@@ -1,8 +1,6 @@
 #!/bin/bash
 
-if [[ $1 == '-f' ]] || [[ $1 == '--force' ]]; then
-    ;
-else
+if ! [[ $1 == '-f' ]] || [[ $1 == '--force' ]]; then
     set -e
 fi
 
