@@ -9,6 +9,8 @@ setxkbmap -layout fi -variant nodeadkeys
 setxkbmap -option 'caps:escape'
 [[ -e Xmodmap ]] && cp Xmodmap $HOME/.Xmodmap
 
+packages=(libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
+
 echo "$(date +'%d.%m.%Y %H:%M:%S') Install vim"
 sudo apt-get install git
 cd /tmp
