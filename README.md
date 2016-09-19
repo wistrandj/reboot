@@ -3,12 +3,10 @@
     setxkbmap -option 'caps:escape'
     mkdir -p $HOME/bin
     cp Xmodmap $HOME/bin
-    # echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.bashrc
+    echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.bashrc
 
 # Vim
-- these are minimal packages to download (on debian 8) for python and clipboard support in vim
-packages=(libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
-
+    packages=(libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
     sudo apt-get install ${packages[@]}
     git clone https://github.com/vim/vim
     cd vim
