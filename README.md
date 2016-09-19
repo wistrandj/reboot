@@ -5,9 +5,13 @@
     cp Xmodmap $HOME/bin
     echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.bashrc
 
-# Vim
-    packages=(libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
+# Some packages
+    packages=(git xsel libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
     sudo apt-get install ${packages[@]}
+
+# Vim
+- Minimal packages for vim for python and clipboard are libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev
+
     git clone https://github.com/vim/vim
     cd vim
     ./configure --with-features=huge --enable-pythoninterp=dynamic --enable-gui=auto --with-x
