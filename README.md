@@ -6,7 +6,7 @@
     echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.bashrc
 
 # Some packages
-    packages=(git xsel libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
+    packages=(git gitk xsel libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
     sudo apt-get install ${packages[@]}
 
 # Vim
@@ -23,3 +23,15 @@
     git clone https://github.com/jasu0/VimBox-rc
     ln -s $HOME/.vim/bundle/VimBox-rc/vimrc $HOME/.vimrc
     vim +PluginInstall +q
+
+# PgAdmin 3
+- Todo
+
+# Java 8
+    sudo vim /etc/apt/sources.list.d/java-8-debian.list
+    deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
+    deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
+    sudo apt-get update
+    sudo apt-get install oracle-java8-installer
+    sudo apt-get install oracle-java8-set-default
