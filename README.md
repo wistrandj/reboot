@@ -28,7 +28,9 @@
 - Todo
 
 # Java 8
+
 [Install Java 8](http://www.webupd8.org/2014/03/how-to-install-oracle-java-8-in-debian.html)
+
     sudo vim /etc/apt/sources.list.d/java-8-debian.list
     deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
     deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
@@ -38,4 +40,5 @@
     sudo apt-get install oracle-java8-set-default
 
 # Docker
+
 [Install docker](https://docs.docker.com/engine/installation/linux/debian/)
