@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DOTFILES=(bash_aliases)
+DOTFILES=(bash_aliases Xmodmap)
 
 for i in "${DOTFILES[@] }"; do
     echo  "$(pwd)/.$i <- $HOME/.$i"
