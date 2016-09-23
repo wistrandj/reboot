@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DOTFILES=(bash_aliases)
+
+for i in "${DOTFILES[@] }"; do
+    echo  "$(pwd)/.$i <- $HOME/.$i"
+    [[ -L "$HOME/.$i" ]] && rm "$HOME/.$i"
+    ln -s "$(pwd)/.$i" "$HOME/.$i"
+done
