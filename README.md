@@ -6,7 +6,7 @@
     echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.bashrc
 
 # Some packages
-    packages=(git gitk xsel libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
+    packages=(ncurses-dev git gitk xsel libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
     sudo apt-get install ${packages[@]}
 
 # Vim
