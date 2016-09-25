@@ -1,5 +1,65 @@
+alias pu='pushd .'
+alias po='popd'
+
+alias mpv='mpv --loop=inf'
+alias todo='todo -f ~/.todo'
+
+# My scripts
+#
+
+alias pro='pronounce'
+alias funet='wget ftp://ftp.funet.fi/dev/1Gnull -O ~/dl/1gnull'
+
+alias enfi='tran fi'
+alias fien='tran en'
+
+alias ed='ed -p:'
+
+# Git
+alias gst='git status'
+alias gd='git diff'
+
+# Settings
+#
+
+alias xres='xrdb -all $HOME/.Xresources'
+alias bashrc='source ~/.bashrc'
+alias via='vim ~/.bash_aliases'
+alias vivi='vim ~/.vimrc'
+
+alias run='./a.out'
+alias urgent='echo -e "\a"'
+
+
+# Other programs
+#
+
+alias dl='cd ~/dl'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias gst='git status'
-alias gd='git diff'
+
+alias find1='find -maxdepth 1'
+
+alias ls='ls -X --color=auto --group-directories-first'
+alias grep='grep --color=auto'
+
+# Abbreviations
+alias id3='id3v2'
+
+# CLI tools
+alias bc='bc -l'
+alias cal='cal -m'
+alias aria2c='aria2c --seed-time=0 --max-upload-limit=50K'
+
+# Graphical programs
+alias feh='feh -F --thumb-width 256 --magick-timeout -1'
+
+# sudo tool
+alias please='eval "sudo $(fc -ln -1)"'
+alias pacman='sudo pacman --color=auto'
+alias reboot='systemctl reboot'
+alias ragequit='systemctl poweroff'
+alias mount='sudo mount'
+alias umount='sudo umount'
+alias pandora='sudo pandora'

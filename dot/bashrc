@@ -1,0 +1,105 @@
+# === TEMP ====================================================================
+
+# === Variables ===============================================================
+#PS1="\e[33m$ \e[39m"
+PS1="\e[32m\w \e[31m>\e[39m "
+
+# eval `dircolors ~/.dir_colors`
+
+# === Key bindings ============================================================
+
+bind Space:magic-space
+bind '"": backward-word'
+bind '"": clear-screen'
+bind '"": backward-word'
+bind '"": forward-word'
+
+# Case insensitive completion
+bind "set completion-ignore-case on"
+shopt -s autocd
+
+# === Directories and files ===================================================
+
+function dup()
+{
+    nohup $(urxvt &> /dev/null )&
+}
+
+function sd() {
+    # You can't set variable $sd in a separate script; this function
+    # must be here in .bashrc.
+    file="/tmp/global_sd"
+
+    case $1 in
+        "")
+            local to="$sd"
+            sd="$(pwd)"
+            cd "$to"
+            ;;
+        "-s"|"--save")
+            pwd > $file
+            sd="$(pwd)"
+            ;;
+        "-l"|"--load")
+            [[ ! -e $file ]] && echo "The sd file doesn't exists" && exit
+            sd="$(cat $file)"
+            ;;
+        "-p"|"--print")
+            cat $file
+            ;;
+    esac
+}
+
+function c {
+    # Clear all selection buffers
+    xsel -b --clear
+    xsel -p --clear
+    return
+}
+
+function p {
+    # Paste the selection from either clipboard or primary buffer
+    if [[ "$1" == "-g" || "$1" == "--gather" ]]; then
+        local prev=""
+        while :; do
+            local cur="$(xsel -p)"
+            if [[ "$cur" != "$prev" ]]; then
+                echo "$cur"
+                [[ ! -t 1 ]] && echo "$cur" >/dev/stderr
+                prev="$cur"
+            fi
+        done
+
+    else
+
+        local paste=`xsel -b`
+        if [[ -z "$paste" ]]; then
+            paste=`xsel -p`
+        fi
+        echo $paste
+    fi
+}
+
+function edit {
+    # Open a script file in vim
+    vim $(which $1)
+}
+
+man() {
+    # Color man pages
+    env LESS_TERMCAP_mb=$(printf "\e[1;32m") \
+        LESS_TERMCAP_md=$(printf "\e[1;35m") \
+        LESS_TERMCAP_me=$(printf "\e[0m") \
+        LESS_TERMCAP_se=$(printf "\e[0m") \
+        LESS_TERMCAP_so=$(printf "\e[1;33m") \
+        LESS_TERMCAP_ue=$(printf "\e[0m") \
+        LESS_TERMCAP_us=$(printf "\e[1;31m") \
+    man "$@"
+}
+
+
+[[ -f $HOME/.bash_aliases ]] && . $HOME/.bash_aliases
+if [[ -e ~/bashrc ]]; then
+    source ~/bashrc
+fi
+# vim: foldmethod=marker
