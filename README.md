@@ -1,15 +1,23 @@
-# Keyboard
+# Init
     setxkbmap -layout fi -variant nodeadkeys
     setxkbmap -option 'caps:escape'
     mkdir -p $HOME/bin
-    cp Xmodmap $HOME/bin
-    echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.bashrc
+    for f in dot/*; do
+        b=$(basename "$f")
+        ln -s "$(pwd)/dot/$b" "$HOME/.$b"
+    done
+    for f in bin/*; do
+        b=$(basename "$f")
+        ln -s "$(pwd)/bin/$b" "$HOME/bin/$b"
+    done
+
+# Init-force
+    ./init -dp Init | sed "s/\<ln\> -s/ln -fs/" | sh -v
 
 # Hello
-    echo Hei maailam
-    echo Moi maailam
-    echo Hassu maailam
-    echo Funny
+    for f in *; do
+        echo ">>> $f"
+    done
 
 # Packages
     packages=(ncurses-dev git gitk xsel libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
