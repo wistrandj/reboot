@@ -5,7 +5,13 @@
     cp Xmodmap $HOME/bin
     echo 'export PATH="$HOME/bin:$PATH"' >> $HOME/.bashrc
 
-# Some packages
+# Hello
+    echo Hei maailam
+    echo Moi maailam
+    echo Hassu maailam
+    echo Funny
+
+# Packages
     packages=(ncurses-dev git gitk xsel libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
     sudo apt-get install ${packages[@]}
 
@@ -16,7 +22,7 @@
     make
     sudo make install
 
-# Install Vim Plugins
+# VimPlugins
     mkdir -p $HOME/.vim/bundle
     cd $HOME/.vim/bundle
     git clone https://github.com/VundleVim/Vundle.vim
@@ -24,10 +30,10 @@
     ln -s $HOME/.vim/bundle/VimBox-rc/vimrc $HOME/.vimrc
     vim +PluginInstall +q
 
-# PgAdmin 3
+# PgAdmin3
 - Todo
 
-# Java 8
+# Java8
 
 [Install Java 8](http://www.webupd8.org/2014/03/how-to-install-oracle-java-8-in-debian.html)
 
