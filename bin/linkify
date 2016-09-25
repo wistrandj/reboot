@@ -1,0 +1,46 @@
+#!/bin/bash
+
+set -e
+
+function linkAllowed() {
+    local b="$1"
+    [[ -L "$DST/$b" ]] && rm "$DST/$b"
+    if [[ -e "$DST/$b" ]]; then
+        echo "Warning: $DST/$f is a regular file or folder. Skipping."
+        return 1
+    fi
+    return 0
+}
+
+function doDeepLinkifyHere() {
+    # Current dir is inside SRC
+    local relativePwd=$(realpath --relative-to="$SRC" ./)
+
+    for f in ./* ./.*; do
+        # local f=$(echo "$f" | sed "s+^\./++")
+        [[ "$f" == '.' ]] || [[ "$f" == '..' ]] && continue
+
+        # TODO should we follow links to folders?
+        if [[ -f "$DST/$f" ]]; then
+            echo "Warning: $DST/$f is a regular file. Skipping"
+            continue
+        elif [[ -d "$DST/$f" ]]; then
+            cd "$f"
+            doDeepLinkifyHere
+            cd ..
+            continue
+        fi
+
+        local src=$(realpath -s "$SRC/$relativePwd/$f")
+        local dst=$(realpath -s "$DST/$relativePwd/$f")
+        ln -s "$src" "$dst"
+    done
+}
+
+SRC=$(realpath -s "$1")
+DST=$(realpath -s "$2")
+
+files=("$SRC"/* "$SRC/."[^.$]*)
+
+cd "$SRC"
+doDeepLinkifyHere
