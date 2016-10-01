@@ -10,9 +10,10 @@
         b=$(basename "$f")
         ln -s "$(pwd)/bin/$b" "$HOME/bin/$b"
     done
+    xmodmap $HOME/.Xmodmap
 
 # Init-force
-    ./init -dp Init | sed "s/\<ln\> -s/ln -fs/" | sh -v
+    ./init -dp Init | sed "s/ln -s/ln -fs/" | sh -v
 
 # Hello
     for f in *; do
