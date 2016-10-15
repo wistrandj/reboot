@@ -1,46 +1,40 @@
 #!/bin/bash
 
 set -e
-
-function linkAllowed() {
-    local b="$1"
-    [[ -L "$DST/$b" ]] && rm "$DST/$b"
-    if [[ -e "$DST/$b" ]]; then
-        echo "Warning: $DST/$f is a regular file or folder. Skipping."
-        return 1
-    fi
-    return 0
-}
-
-function doDeepLinkifyHere() {
-    # Current dir is inside SRC
-    local relativePwd=$(realpath --relative-to="$SRC" ./)
-
-    for f in ./* ./.*; do
-        # local f=$(echo "$f" | sed "s+^\./++")
-        [[ "$f" == '.' ]] || [[ "$f" == '..' ]] && continue
-
-        # TODO should we follow links to folders?
-        if [[ -f "$DST/$f" ]]; then
-            echo "Warning: $DST/$f is a regular file. Skipping"
-            continue
-        elif [[ -d "$DST/$f" ]]; then
-            cd "$f"
-            doDeepLinkifyHere
-            cd ..
-            continue
-        fi
-
-        local src=$(realpath -s "$SRC/$relativePwd/$f")
-        local dst=$(realpath -s "$DST/$relativePwd/$f")
-        ln -s "$src" "$dst"
-    done
-}
-
 SRC=$(realpath -s "$1")
 DST=$(realpath -s "$2")
 
-files=("$SRC"/* "$SRC/."[^.$]*)
+if [[ $# -eq 0 ]] || [[ $1 == -h ]] || $1 == --help ]]; then
+    echo "Usage:"
+    echo
+    echo " linkify <src> <dst>"
+    echo
+    echo "This script links symbolically every file from folder <src> to <dst>."
+    echo "It won't overwrite any files and creates links recursively if"
+    echo "a  folder already exists on dst folder."
+fi
+
+function doDeepLinkifyHere() {
+    # Current dir is inside SRC
+    for f in * .*; do
+        local rel=$(realpath --relative-to="$SRC" ./)
+        local b="$(basename $f)"
+        [[ "$b" == '.' ]] || [[ "$b" == '..' ]] && continue
+        [[ -L "$DST/$rel/$f" ]] && rm "$DST/$rel/$f"
+
+        if [[ -d "$DST/$rel/$f" ]]; then
+            cd "$f"
+            doLink
+            cd ..
+        elif [[ -e "$DST/$rel/$f" ]]; then
+            echo "Warning: $DST/$rel/$f exists. Skipping."
+        else
+            local src=$(realpath -s "$SRC/$rel/$f")
+            local dst=$(realpath -s "$DST/$rel/$f")
+            ln -s "$src" "$dst"
+        fi
+    done
+}
 
 cd "$SRC"
 doDeepLinkifyHere
