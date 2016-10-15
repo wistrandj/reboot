@@ -1,8 +1,7 @@
-# === TEMP ====================================================================
-
 # === Variables ===============================================================
 #PS1="\e[33m$ \e[39m"
 PS1="\e[32m\w \e[31m>\e[39m "
+PATH="$HOME/bin/:$PATH"
 
 # eval `dircolors ~/.dir_colors`
 
@@ -19,6 +18,12 @@ bind "set completion-ignore-case on"
 shopt -s autocd
 
 # === Directories and files ===================================================
+
+function qwerty() {
+    setxkbmap -layout fi -variant nodeadkeys
+    setxkbmap -option caps:escape
+    xmodmap $HOME/.Xmodmap
+}
 
 function dup()
 {
