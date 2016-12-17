@@ -1,0 +1,7 @@
+---
+- name: Setup basic tools for fresh OS
+  hosts: all
+  vars:
+    - user_name: ansible
+  roles:
+    - init

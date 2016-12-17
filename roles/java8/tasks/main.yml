@@ -1,0 +1,15 @@
+---
+- name: Set apt list
+  template: src=java8-debian.list dest=/etc/apt/sources.list.d/java8-debian.list
+
+- name: Set key file
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    state: present
+    id: EEA14886
+
+- name: Install Java8
+  apt: name={{item}}
+  with_items:
+    - oracle-java8-installer
+    - oracle-java8-set-default

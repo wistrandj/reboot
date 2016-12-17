@@ -1,0 +1,16 @@
+---
+
+- name: Fetch vim
+  tags: vim
+  git:
+    repo: https://github.com/vim/vim
+    dest: /tmp/vim
+
+- name: Configure
+  command: ./configure --prefix=/usr/local/ chdir=/tmp/vim/
+
+- name: Make
+  command: /usr/bin/make chdir=/tmp/vim
+
+- name: Make install
+  command: /usr/bin/make install chdir=/tmp/vim
