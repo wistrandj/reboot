@@ -2,6 +2,8 @@
 - name: Setup basic tools for fresh OS
   hosts: all
   vars:
-    - user_name: ansible
+    - user_name: jasu
   roles:
+    - common
     - init
+    - vim

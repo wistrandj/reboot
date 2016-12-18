@@ -1,16 +1,67 @@
 ---
 
+- stat: path=/usr/local/bin/vim
+  register: vim
+
 - name: Fetch vim
+  when: vim.stat.exists == False
   tags: vim
   git:
     repo: https://github.com/vim/vim
     dest: /tmp/vim
 
 - name: Configure
+  when: vim.stat.exists == False
   command: ./configure --prefix=/usr/local/ chdir=/tmp/vim/
 
 - name: Make
+  when: vim.stat.exists == False
   command: /usr/bin/make chdir=/tmp/vim
 
 - name: Make install
+  when: vim.stat.exists == False
   command: /usr/bin/make install chdir=/tmp/vim
+
+
+
+# Vim plugins
+
+- stat: path=/home/{{ user_name }}/.vim/bundle/VimBox-rc
+  register: vimbox
+
+- name: Create .vim folder
+  when: vimbox.stat.exists == False
+  file:
+    dest: /home/{{ user_name }}/.vim/bundle
+    state: directory
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+
+- name: Download Vundle plugin
+  when: vimbox.stat.exists == False
+  git:
+    repo: https://github.com/VundleVim/Vundle.vim
+    dest: /home/{{ user_name }}/.vim/bundle/Vundle.vim
+
+- name: Download VimBox plugin
+  when: vimbox.stat.exists == False
+  git:
+    repo: https://github.com/jasu0/VimBox-rc
+    dest: /home/{{ user_name }}/.vim/bundle/VimBox-rc
+
+- name: Symlink .vimrc
+  file:
+    dest: /home/{{ user_name }}/.vimrc
+    src: /home/{{ user_name }}/.vim/bundle/VimBox-rc/vimrc
+    state: link
+
+- name: Change user as plugin owners
+  when: vimbox.stat.exists == False
+  file:
+    dest: "{{ item }}"
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
+    recurse: yes
+  with_items:
+    - "/home/{{ user_name }}/.vim/bundle/Vundle.vim"
+    - "/home/{{ user_name }}/.vim/bundle/VimBox-rc"
