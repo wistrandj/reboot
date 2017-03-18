@@ -34,6 +34,7 @@
 - name: "Check if Guest Additions exists"
   action: "shell lsmod | grep vboxsf"
   register: vboxsf_exists
+  ignore_errors: true
 
 - block:
   - name: Install guest additions prerequisites
@@ -60,7 +61,7 @@
   - name: Download image
     uri:
       url: "http://download.virtualbox.org/virtualbox/{{ item }}/VBoxGuestAdditions_{{ item }}.iso"
-      dst: "/opt/VBoxGuestAdditions_{{ item }}.iso"
+      dest: "/opt/VBoxGuestAdditions_{{ item }}.iso"
     when: imagefile.stat.exists == false
     with_items:
       - "{{ guestaddition_version }}"
@@ -93,7 +94,7 @@
 
   when:
   - vbox
-  - vboxsf_exists.stdout == 0
+  - vboxsf_exists.failed is defined
   tags:
   - install
   - test

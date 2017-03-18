@@ -6,7 +6,7 @@
   #       state: "directory"
 
   - template:
-      src: "10-autologin.conf"
+      src: "sys/10-autologin.conf"
       dest: "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
 
   when: "{{ vbox }}"
@@ -18,7 +18,7 @@
   #       state: "directory"
 
   - template:
-      src: "10-keyboard-layout.conf"
+      src: "sys/10-keyboard-layout.conf"
       dest: "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
 
 
