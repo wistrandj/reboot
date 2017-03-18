@@ -14,7 +14,7 @@
 
 - block:
   - file:
-      path: "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
+      path: "/etc/X11/xorg.conf.d/"
       state: "directory"
 
   - template:
