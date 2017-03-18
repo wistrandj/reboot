@@ -1,18 +1,81 @@
 ---
-- name: Install basic tools
-  apt: name={{item}} state=present
-  with_items:
-       - console-data
-       - dbus-x11
-       - git
-       - gitk
-       - libgtk2.0-dev
-       - libx11-dev
-       - libxt-dev
-       - ncurses-dev
-       - python-dev
-       - wget
-       - xfce4
-       - xfce4-terminal
-       - lightdm
-       - xsel
+
+- block:
+  - name: Install basic tools
+    apt: name={{item}} state=present
+    with_items:
+        - console-data
+        - dbus-x11
+        - git
+        - gitk
+        - libgtk2.0-dev
+        - libx11-dev
+        - libxt-dev
+        - ncurses-dev
+        - python-dev
+        - wget
+        - xfce4
+        - xfce4-terminal
+        - lightdm
+        - xsel
+
+
+- block:
+  - name: Install prerequisites
+    apt:
+      name: "{{ item }}"
+      state: "present"
+    with_items:
+      - build-essential
+      - gcc
+      - make
+      - module-assistant
+
+  - name: Install linux-headers
+    shell: apt-get install -y linux-headers-$(uname -r)
+    ignore_errors: True
+
+  - name: m-a prepare
+    shell: m-a prepare
+
+  - stat:
+      path: "/opt/VBoxGuestAdditions_{{ guestaddition_version }}.iso"
+    register: imagefile
+
+  - name: Download image
+    uri:
+      url: "http://download.virtualbox.org/virtualbox/{{ item }}/VBoxGuestAdditions_{{ item }}.iso"
+      dst: "/opt/VBoxGuestAdditions_{{ item }}.iso"
+    when: imagefile.stat.exists == false
+    with_items:
+      - "{{ guestaddition_version }}"
+
+  - name: Mount image
+    mount:
+      fstype: "iso9660"
+      opts: "loop"
+      name: "/mnt"
+      src: "/opt/VBoxGuestAdditions_{{ item }}.iso"
+      state: "mounted"
+    with_items:
+      - "{{ guestaddition_version }}"
+
+  - name: Install
+    shell: "/mnt/VBoxLinuxAdditions.run --nox11"
+
+  - name: Umount image
+    mount:
+      fstype: "none"
+      name: "/mnt"
+      src: "none"
+      state: "unmounted"
+
+  # - name: Remove image
+  #   file:
+  #     path: "/opt/VBoxGuestAdditions_{{ item }}.iso"
+  #   with_items:
+  #     - "{{ guestaddition_version }}"
+
+  when: "{{ vbox }}"
+  tags:
+  - config
