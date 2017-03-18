@@ -10,10 +10,10 @@
 
 - name: Setup dot files
   template:
-    src={{item.src}}
-    dest=/home/{{ user_name }}/{{item.dest}}
-    owner={{ user_name }}
-    group={{ user_name }}
+    src: "{{item.src}}"
+    dest: "/home/{{ user_name }}/{{ item.dest }}"
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
   with_items:
     - { src: 'dot/bash_aliases', dest: '.bash_aliases'}
     - { src: 'dot/bash_profile', dest: '.bash_profile'}
@@ -25,12 +25,17 @@
 - file:
     name: "/home/{{ user_name }}/bin"
     state: directory
-    owner: {{ user_name }}
-    group: {{ user_name }}
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
 
 - name: Copy shell scripts
-  template: src={{item.src}} dest=/home/{{ user_name }}/bin/{{item.dest}}
-    owner={{ user_name }}
-    group={{ user_name }}
+  template:
+    src: "{{ item.src }}"
+    dest: "/home/{{ user_name }}/bin/{{ item.dest }}"
+    owner: "{{ user_name }}"
+    group: "{{ user_name }}"
   with_items:
     - { src: 'bin/linkify', dest: 'linkify' }
+
+  tags:
+  - config

@@ -18,10 +18,12 @@
         - xfce4-terminal
         - lightdm
         - xsel
+  tags:
+  - install
 
 
 - block:
-  - name: Install prerequisites
+  - name: Install guest additions prerequisites
     apt:
       name: "{{ item }}"
       state: "present"
@@ -78,4 +80,4 @@
 
   when: "{{ vbox }}"
   tags:
-  - config
+  - install

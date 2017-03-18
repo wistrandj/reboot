@@ -8,7 +8,6 @@
     - vbox: true
     - vagrant: false
   roles:
+    - users
     # - common
-    # - init
     # - vim
-    - guestadditions
