@@ -1,9 +1,9 @@
 ---
 
 - block:
-  #   - file:
-  #       src: "/etc/lightdm/lightdm.conf.d"
-  #       state: "directory"
+  - file:
+      path: "/etc/lightdm/lightdm.conf.d"
+      state: "directory"
 
   - template:
       src: "sys/10-autologin.conf"
@@ -13,9 +13,9 @@
 
 
 - block:
-  #   - file:
-  #       src: "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
-  #       state: "directory"
+  - file:
+      path: "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
+      state: "directory"
 
   - template:
       src: "sys/10-keyboard-layout.conf"
@@ -24,17 +24,19 @@
 
 - block:
   - name: Check if user exists
-    action: "shell /usr/bin/getent passwd $user | /usr/bin/wc -l | tr -d ' '"
-    register: user_exist
+    # action: "shell /usr/bin/getent passwd $user | /usr/bin/wc -l | tr -d ' '"
+    action: "shell /usr/bin/getent passwd {{ user_name }}"
+    register: user_exists
+    ignore_errors: true
 
   - name: Create user
     user:
       name: "{{ user_name }}"
       password: "{{ password }}"
-      groups: "{{ user_name }},sudo"
+      groups: "sudo"
       shell: "/bin/bash"
       state: "present"
-    when: user_exist.stdout == 0
+    when: user_exists.rc != 0
 
   - name: Setup dot files
     template:
