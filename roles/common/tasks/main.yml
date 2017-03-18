@@ -4,7 +4,6 @@
   - name: Install basic tools
     apt: name={{item}} state=present
     with_items:
-        - console-data
         - dbus-x11
         - git
         - gitk
@@ -14,13 +13,26 @@
         - ncurses-dev
         - python-dev
         - wget
-        - xfce4
-        - xfce4-terminal
-        - lightdm
         - xsel
   tags:
   - install
 
+  - name: Install Vagrant specific packages
+    apt: name={{item}} state=present
+    with_items:
+        - console-data
+        - xfce4
+        - xfce4-terminal
+        - lightdm
+    when: "{{ vagrant }}"
+  tags:
+  - install
+
+
+
+- name: "Check if Guest Additions exists"
+  action: "shell lsmod | grep vboxsf"
+  register: vboxsf_exists
 
 - block:
   - name: Install guest additions prerequisites
@@ -78,6 +90,9 @@
   #   with_items:
   #     - "{{ guestaddition_version }}"
 
-  when: "{{ vbox }}"
+  when:
+  - vbox
+  - vboxsf_exists.stdout == 0
   tags:
   - install
+  - test

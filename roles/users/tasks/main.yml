@@ -34,7 +34,7 @@
       groups: "{{ user_name }},sudo"
       shell: "/bin/bash"
       state: "present"
-    when: {{ user_exist.stdout }} == 0
+    when: user_exist.stdout == 0
 
   - name: Setup dot files
     template:
