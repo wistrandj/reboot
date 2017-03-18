@@ -1,41 +1,64 @@
 ---
 
-- name: Create user
-  user:
-    name: "{{ user_name }}"
-    password: "{{ password }}"
-    groups: "{{ user_name }},sudo"
-    shell: "/bin/bash"
-    state: "present"
+- block:
+  #   - file:
+  #       src: "/etc/lightdm/lightdm.conf.d"
+  #       state: "directory"
 
-- name: Setup dot files
-  template:
-    src: "{{item.src}}"
-    dest: "/home/{{ user_name }}/{{ item.dest }}"
-    owner: "{{ user_name }}"
-    group: "{{ user_name }}"
-  with_items:
-    - { src: 'dot/bash_aliases', dest: '.bash_aliases'}
-    - { src: 'dot/bash_profile', dest: '.bash_profile'}
-    - { src: 'dot/bashrc', dest: '.bashrc'}
-    - { src: 'dot/inputrc', dest: '.inputrc'}
-    - { src: 'dot/xinitrc', dest: '.xinitrc'}
-    - { src: 'dot/Xmodmap', dest: '.Xmodmap'}
+  - template:
+      src: "10-autologin.conf"
+      dest: "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
 
-- file:
-    name: "/home/{{ user_name }}/bin"
-    state: directory
-    owner: "{{ user_name }}"
-    group: "{{ user_name }}"
+  when: "{{ vbox }}"
 
-- name: Copy shell scripts
-  template:
-    src: "{{ item.src }}"
-    dest: "/home/{{ user_name }}/bin/{{ item.dest }}"
-    owner: "{{ user_name }}"
-    group: "{{ user_name }}"
-  with_items:
-    - { src: 'bin/linkify', dest: 'linkify' }
+
+- block:
+  #   - file:
+  #       src: "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
+  #       state: "directory"
+
+  - template:
+      src: "10-keyboard-layout.conf"
+      dest: "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
+
+
+- block:
+  - name: Create user
+    user:
+      name: "{{ user_name }}"
+      password: "{{ password }}"
+      groups: "{{ user_name }},sudo"
+      shell: "/bin/bash"
+      state: "present"
+
+  - name: Setup dot files
+    template:
+      src: "{{item.src}}"
+      dest: "/home/{{ user_name }}/{{ item.dest }}"
+      owner: "{{ user_name }}"
+      group: "{{ user_name }}"
+    with_items:
+      - { src: 'dot/bash_aliases', dest: '.bash_aliases'}
+      - { src: 'dot/bash_profile', dest: '.bash_profile'}
+      - { src: 'dot/bashrc', dest: '.bashrc'}
+      - { src: 'dot/inputrc', dest: '.inputrc'}
+      - { src: 'dot/xinitrc', dest: '.xinitrc'}
+      - { src: 'dot/Xmodmap', dest: '.Xmodmap'}
+
+  - file:
+      name: "/home/{{ user_name }}/bin"
+      state: directory
+      owner: "{{ user_name }}"
+      group: "{{ user_name }}"
+
+  - name: Copy shell scripts
+    template:
+      src: "{{ item.src }}"
+      dest: "/home/{{ user_name }}/bin/{{ item.dest }}"
+      owner: "{{ user_name }}"
+      group: "{{ user_name }}"
+    with_items:
+      - { src: 'bin/linkify', dest: 'linkify' }
 
   tags:
   - config

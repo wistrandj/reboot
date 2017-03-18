@@ -8,6 +8,6 @@
     - vbox: true
     - vagrant: false
   roles:
+    - common
     - users
-    # - common
-    # - vim
+    - vim
