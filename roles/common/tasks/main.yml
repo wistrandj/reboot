@@ -7,6 +7,7 @@
         - dbus-x11
         - git
         - gitk
+        - iceweasel
         - libgtk2.0-dev
         - libx11-dev
         - libxt-dev
