@@ -3,7 +3,11 @@
   hosts: all
   vars:
     - user_name: jasu
+    - guestaddition_version: "5.1.16"
+    - vbox: true
+    - vagrant: false
   roles:
-    - common
-    - init
-    - vim
+    # - common
+    # - init
+    # - vim
+    - guestadditions

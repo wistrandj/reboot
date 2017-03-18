@@ -2,6 +2,7 @@
 - name: Install basic tools
   apt: name={{item}} state=present
   with_items:
+       - console-data
        - dbus-x11
        - git
        - gitk
@@ -10,4 +11,8 @@
        - libxt-dev
        - ncurses-dev
        - python-dev
+       - wget
+       - xfce4
+       - xfce4-terminal
+       - lightdm
        - xsel
