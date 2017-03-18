@@ -65,5 +65,10 @@
     with_items:
       - { src: 'bin/linkify', dest: 'linkify' }
 
+  - name: Copy XFCE4 config
+    template:
+      src: "xfce4"
+      dest: "/home/{{ user_name }}/.config"
+
   tags:
   - config
