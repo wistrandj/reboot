@@ -1,4 +1,13 @@
 ---
+
+- name: Create user
+  user:
+    name: "{{ user_name }}"
+    password: "{{ password }}"
+    groups: "{{ user_name }},sudo"
+    shell: "/bin/bash"
+    state: "present"
+
 - name: Setup dot files
   template:
     src={{item.src}}
@@ -13,10 +22,11 @@
     - { src: 'dot/xinitrc', dest: '.xinitrc'}
     - { src: 'dot/Xmodmap', dest: '.Xmodmap'}
 
-- name: mkdir bin
-  file: name="/home/{{ user_name }}/bin" state=directory
-    owner={{ user_name }}
-    group={{ user_name }}
+- file:
+    name: "/home/{{ user_name }}/bin"
+    state: directory
+    owner: {{ user_name }}
+    group: {{ user_name }}
 
 - name: Copy shell scripts
   template: src={{item.src}} dest=/home/{{ user_name }}/bin/{{item.dest}}
