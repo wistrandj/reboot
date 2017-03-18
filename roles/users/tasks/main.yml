@@ -23,6 +23,10 @@
 
 
 - block:
+  - name: Check if user exists
+    action: "shell /usr/bin/getent passwd $user | /usr/bin/wc -l | tr -d ' '"
+    register: user_exist
+
   - name: Create user
     user:
       name: "{{ user_name }}"
@@ -30,6 +34,7 @@
       groups: "{{ user_name }},sudo"
       shell: "/bin/bash"
       state: "present"
+    when: {{ user_exist.stdout }} == 0
 
   - name: Setup dot files
     template:
