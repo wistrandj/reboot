@@ -6,19 +6,22 @@ guestadditions_version="5.1.16"
 guestadditions_url="http://download.virtualbox.org/virtualbox/${guestadditions_version}/VBoxGuestAdditions_${guestadditions_version}.iso -O VBoxGuestAdditions_${guestadditions_version}.iso"
 
 apt-get update -y
-apt-get install -y git vim xfce4 xfce4-terminal wget sed
+apt-get install -y git vim xfce4 xfce4-terminal wget sed lightdm
 printf "\n" | pt-get install -y console-data
 loadkeys fi
 apt-get upgrade -y
 
-# Install guest additions for virtualbox
-apt-get install build-essential module-assistant linux-headers-$(uname -r) gcc make lightdm
-m-a prepare
-wget -c ${guestadditions_url}\
-   -O /opt/VBoxGuestAdditions_${guestadditions_version}.iso
-mount /opt/VBoxGuestAdditions_${guestadditions_version}.iso -o loop /mnt
-sh /mnt/VBoxLinuxAdditions.run --nox11
-# rm /opt/VBoxLinuxAdditions_${guestadditions_version}.iso
+# NOTE: With Vagrant, use plugins to automatically install guestadditions:
+#  $ vagrant install plugin vagrant-vbguest
+#  $ vagrant install plugin vagrant-share
+# # Install guest additions for virtualbox
+# apt-get install build-essential module-assistant linux-headers-$(uname -r) gcc make
+# m-a prepare
+# wget -c ${guestadditions_url}\
+#    -O /opt/VBoxGuestAdditions_${guestadditions_version}.iso
+# mount /opt/VBoxGuestAdditions_${guestadditions_version}.iso -o loop /mnt
+# sh /mnt/VBoxLinuxAdditions.run --nox11
+# # rm /opt/VBoxLinuxAdditions_${guestadditions_version}.iso
 
 # Create user
 useradd -m ${user_name}
