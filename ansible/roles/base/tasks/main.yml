@@ -1,0 +1,32 @@
+---
+
+- block:
+  - name: "Read linux-headers version"
+    shell: "uname -r"
+    register: "r_uname"
+
+  - name: "Install basic tools"
+    apt:
+      name: "{{ item }}"
+      state: "present"
+    with_items:
+    - "build-essential"
+    - "console-data"
+    - "dbus-x11"
+    - "gcc"
+    - "git"
+    - "gitk"
+    - "iceweasel"
+    - "libgtk2.0-dev"
+    - "libx11-dev"
+    - "libxt-dev"
+    - "linux-headers-{{ r_uname.stdout }}"
+    - "make"
+    - "module-assistant"
+    - "ncurses-dev"
+    - "python-dev"
+    - "wget"
+    - "xsel"
+
+  tags:
+  - install

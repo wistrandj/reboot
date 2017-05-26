@@ -1,57 +1,22 @@
 ---
 
-- block:
-  - name: Install basic tools
-    apt: name={{item}} state=present
-    with_items:
-        - dbus-x11
-        - git
-        - gitk
-        - iceweasel
-        - libgtk2.0-dev
-        - libx11-dev
-        - libxt-dev
-        - ncurses-dev
-        - python-dev
-        - wget
-        - xsel
-
-  - name: Install Vagrant specific packages
-    apt:
-      name: "{{ item }}"
-      state: present
-    with_items:
-        - console-data
-        - xfce4
-        - xfce4-terminal
-        - lightdm
-    when: "{{ vagrant }}"
-
-  tags:
-  - install
-
-
+- name: Install Vagrant specific packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+  - xfce4
+  - xfce4-terminal
+  - lightdm
+  when: "{{ vagrant }}"
 
 - name: "Check if Guest Additions exists"
   action: "shell lsmod | grep vboxsf"
   register: vboxsf_exists
   ignore_errors: true
 
+
 - block:
-  - name: Install guest additions prerequisites
-    apt:
-      name: "{{ item }}"
-      state: "present"
-    with_items:
-      - build-essential
-      - gcc
-      - make
-      - module-assistant
-
-  - name: Install linux-headers
-    shell: apt-get install -y linux-headers-$(uname -r)
-    ignore_errors: True
-
   - name: m-a prepare
     shell: m-a prepare
 

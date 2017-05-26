@@ -1,13 +1,15 @@
 ---
 - name: Setup basic tools for fresh OS
-  hosts: all
+  hosts: localhost
   vars:
-    - user_name: "jasu"
-    - password: "password"
-    - guestaddition_version: "5.1.16"
-    - vbox: true
-    - vagrant: true
+  - user_name: "jasu"
+  - password: "password"
+  - guestaddition_version: "5.1.16"
+  - vbox: true
+  - vagrant: true
   roles:
-    - common
-    - users
-    - vim
+  # - base
+  # - java8
+  - users
+  # - vbox
+  # - vim
