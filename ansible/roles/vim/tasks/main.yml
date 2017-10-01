@@ -1,67 +1,79 @@
 ---
 
-- stat: "path=/usr/local/bin/vim"
-  register: "vim"
+- stat:
+    path: "/usr/local/bin/vim"
+  register: "r_vim"
 
-- name: "Fetch vim"
-  when: "vim.stat.exists == False"
-  tags: "vim"
-  git:
-    repo: "https://github.com/vim/vim"
-    dest: "/tmp/vim"
+- block:
 
-- name: "Configure"
-  when: "vim.stat.exists == False"
-  command: "./configure --prefix=/usr/local/ chdir=/tmp/vim/"
+  - name: "fetch vim"
+    git:
+      repo: "https://github.com/vim/vim"
+      dest: "/tmp/vim"
+  
+  - name: "configure"
+    command: "./configure --prefix=/usr/local/"
+    args:
+      chdir: "/tmp/vim/"
+  
+  - name: "make"
+    command: "/usr/bin/make"
+    args:
+      chdir: "/tmp/vim/"
+  
+  - name: "make install"
+    command: "/usr/bin/make install"
+    args:
+      chdir: "/tmp/vim/"
+    become: true
 
-- name: "Make"
-  when: "vim.stat.exists == False"
-  command: "/usr/bin/make chdir=/tmp/vim"
-
-- name: "Make install"
-  when: "vim.stat.exists == False"
-  command: "/usr/bin/make install chdir=/tmp/vim"
-
+  when:
+  - "r_vim.stat.exists == False"
 
 
 # Vim plugins
 
-- stat: "path=/home/{{ user_name }}/.vim/bundle/VimBox-rc"
-  register: "vimbox"
+- stat:
+    path: "/home/{{ user_name }}/.vim/bundle/VimBox-rc"
+  become: true
+  become_user: "{{ user_name }}"
+  register: "r_vimbox"
 
-- name: "Create .vim folder"
-  when: "vimbox.stat.exists == False"
-  file:
-    dest: "/home/{{ user_name }}/.vim/bundle"
-    state: "directory"
-    owner: "{{ user_name }}"
-    group: "{{ user_name }}"
+- debug:
+    msg: "{{ r_vimbox }}"
 
-- name: "Download Vundle plugin"
-  when: "vimbox.stat.exists == False"
-  git:
-    repo: "https://github.com/VundleVim/Vundle.vim"
-    dest: "/home/{{ user_name }}/.vim/bundle/Vundle.vim"
 
-- name: "Download VimBox plugin"
-  when: "vimbox.stat.exists == False"
-  git:
-    repo: "https://github.com/jasu0/VimBox-rc"
-    dest: "/home/{{ user_name }}/.vim/bundle/VimBox-rc"
+- block:
 
-- name: "Symlink .vimrc"
-  file:
-    dest: "/home/{{ user_name }}/.vimrc"
-    src: "/home/{{ user_name }}/.vim/bundle/VimBox-rc/vimrc"
-    state: "link"
+  - name: "create .vim folder"
+    file:
+      dest: "/home/{{ user_name }}/.vim/bundle"
+      state: "directory"
+      owner: "{{ user_name }}"
+      group: "{{ user_name }}"
+    become: true
+    become_user: "{{ user_name }}"
 
-- name: "Change user as plugin owners"
-  when: "vimbox.stat.exists == False"
-  file:
-    dest: "{{ item }}"
-    owner: "{{ user_name }}"
-    group: "{{ user_name }}"
-    recurse: "yes"
-  with_items:
-    - "/home/{{ user_name }}/.vim/bundle/Vundle.vim"
-    - "/home/{{ user_name }}/.vim/bundle/VimBox-rc"
+  - name: "git clone plugins"
+    git:
+      repo: "https://github.com/{{ item.user }}/{{ item.repo }}"
+      dest: "/home/{{ user_name }}/.vim/bundle/{{ item.repo }}"
+    become: true
+    become_user: "{{ user_name }}"
+    with_items:
+    - user: "VundleVim"
+      repo: "Vundle.vim"
+    - user: "jasu0"
+      repo: "VimBox-rc"
+  
+  - name: "symlink .vimrc"
+    file:
+      dest: "/home/{{ user_name }}/.vimrc"
+      src: "/home/{{ user_name }}/.vim/bundle/VimBox-rc/vimrc"
+      state: "link"
+    become: true
+    become_user: "{{ user_name }}"
+
+  when:
+  - r_vim.stat.exists == True
+

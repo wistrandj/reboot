@@ -1,66 +1,59 @@
 ---
+# This roles install Virtual Box's Guest Additions
 
-- name: Install Vagrant specific packages
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-  - xfce4
-  - xfce4-terminal
-  - lightdm
-  when: "{{ vagrant }}"
-
-- name: "Check if Guest Additions exists"
+- name: "check if Guest Additions exists"
   action: "shell lsmod | grep vboxsf"
-  register: vboxsf_exists
+  register: r_vboxsf_exists
   ignore_errors: true
 
 
 - block:
-  - name: m-a prepare
-    shell: m-a prepare
+  - name: "m-a prepare"
+    shell: "m-a prepare"
+    become: true
 
   - stat:
-      path: "/opt/VBoxGuestAdditions_{{ guestaddition_version }}.iso"
-    register: imagefile
+      path: "/tmp/VBoxGuestAdditions_{{ guestaddition_version }}.iso"
+    register: r_imagefile
 
-  - name: Download image
+  - name: "download guestaddititions image"
     uri:
       url: "http://download.virtualbox.org/virtualbox/{{ item }}/VBoxGuestAdditions_{{ item }}.iso"
-      dest: "/opt/VBoxGuestAdditions_{{ item }}.iso"
-    when: imagefile.stat.exists == false
+      dest: "/tmp/VBoxGuestAdditions_{{ item }}.iso"
+    when: r_imagefile.stat.exists == false
     with_items:
-      - "{{ guestaddition_version }}"
+    - "{{ guestaddition_version }}"
 
-  - name: Mount image
+  - name: "mount image"
     mount:
       fstype: "iso9660"
       opts: "loop"
       name: "/mnt"
-      src: "/opt/VBoxGuestAdditions_{{ item }}.iso"
+      src: "/tmp/VBoxGuestAdditions_{{ item }}.iso"
       state: "mounted"
+    become: true
     with_items:
-      - "{{ guestaddition_version }}"
+    - "{{ guestaddition_version }}"
 
-  - name: Install
+  - name: "install guest additions"
     shell: "/mnt/VBoxLinuxAdditions.run --nox11"
+    become: true
+    when:
+    - r_vboxsf_exists.failed is defined
 
-  - name: Umount image
+  - name: "umount image"
     mount:
       fstype: "none"
       name: "/mnt"
       src: "none"
       state: "unmounted"
+    become: true
 
   # - name: Remove image
   #   file:
-  #     path: "/opt/VBoxGuestAdditions_{{ item }}.iso"
+  #     path: "/tmp/VBoxGuestAdditions_{{ item }}.iso"
   #   with_items:
   #     - "{{ guestaddition_version }}"
 
   when:
-  - vbox
-  - vboxsf_exists.failed is defined
-  tags:
-  - install
-  - test
+  - r_vboxsf_exists.failed is not defined
