@@ -1,0 +1,40 @@
+---
+
+- block:
+  - name: "install base packages"
+    apt:
+      name: "{{ item }}"
+      state: "present"
+  become: true
+  with_items:
+  - "xfce4"
+  - "xfce4-terminal"
+  - "lightdm"
+
+  - name: "Ensure that common config directories exists"
+    file:
+      path: "{{ item }}"
+      state: "directory"
+    become: true
+    with_items:
+    - "/etc/lightdm/lightdm.conf.d"
+    - "/etc/X11/xorg.conf.d/"
+
+
+  - name: "Copy common config files"
+    tempalte:
+      src: "./{{ item }}"
+      dest: "{{ item }}"
+    become: true
+    with_items:
+    - "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
+    - "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
+
+  - name: "Copy user specific XFCE4 config"
+    copy:
+      src: "home/user/config/xfce4"
+      dest: "/home/{{ item.uname }}/.config"
+    become: true
+    become_user: "{{ item.uname }}"
+    with_items:
+    - "{{ os_users }}"

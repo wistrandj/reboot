@@ -1,14 +1,15 @@
 ---
 
 - block:
-  - name: "Read linux-headers version"
+  - name: "read linux-headers version"
     shell: "uname -r"
-    register: "r_uname"
+    register: r_uname
 
-  - name: "Install basic tools"
+  - name: "install basic tools"
     apt:
       name: "{{ item }}"
       state: "present"
+    become: true
     with_items:
     - "build-essential"
     - "console-data"
@@ -25,8 +26,6 @@
     - "module-assistant"
     - "ncurses-dev"
     - "python-dev"
+    - "sed"
     - "wget"
     - "xsel"
-
-  tags:
-  - install

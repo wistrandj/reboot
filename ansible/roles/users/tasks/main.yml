@@ -1,70 +1,36 @@
 ---
 
 - block:
-  - name: "Ensure that config directory exists"
+  - name: "create os users"
+    user:
+      name: "{{ item.uname  }}"
+      password: "{{ item.pword }}"
+      groups: "sudo"
+      shell: "/bin/bash"
+      state: "present"
+    become: true
+    with_items:
+    - "{{ os_users }}"
+
+  - name: "setup user dot files"
+    copy:
+      src: "./home/user/{{ item[1] }}"
+      dest: "/home/{{ item[0].uname }}/.{{ item[1] }}"
+      owner: "{{ item[0].uname }}"
+      group: "{{ item[0].uname }}"
+    become: true
+    become_user: "{{ item[0].uname }}"
+    with_nested:
+    - "{{ os_users }}"
+    - ["bash_aliases", "bash_profile", "bashrc", "inputrc", "xinitrc", "Xmodmap"]
+
+  - name: "create bin directory"
     file:
-      path: "{{ item }}"
+      path: "/home/{{ item.uname }}/bin"
       state: "directory"
+      owner: "{{ item.uname }}"
+      group: "{{ item.uname }}"
+    become: true
+    become_user: "{{ item.uname }}"
     with_items:
-    - "/etc/lightdm/lightdm.conf.d"
-    - "/etc/X11/xorg.conf.d/"
-
-  - name: "Copy configs"
-    copy:
-      src: "{{ item }}"
-      dest: "/{{ item }}"
-    with_items:
-    - "etc/lightdm/lightdm.conf.d/10-autologin.conf"
-    - "etc/X11/xorg.conf.d/10-keyboard-layout.conf"
-
-- block:
-  - name: "Check that user exists"
-    shell: "getent passwd {{ user_name }}"
-    register: "r_user_exist"
-    failed_when: "false"
-
-  #   - name: "Create user"
-  #     user:
-  #       name: "{{ user_name }}"
-  #       password: "{{ password }}"
-  #       groups: "sudo"
-  #       shell: "/bin/bash"
-  #       state: "present"
-
-  - name: "Setup user dot files"
-    copy:
-      src: "home/user/{{ item }}"
-      dest: "/home/{{ user_name }}/.{{ item }}"
-      owner: "{{ user_name }}"
-      group: "{{ user_name }}"
-    with_items:
-    - "bash_aliases"
-    - "bash_profile"
-    - "bashrc"
-    - "inputrc"
-    - "xinitrc"
-    - "Xmodmap"
-
-  - name: "Create bin directory"
-    file:
-      path: "/home/{{ user_name }}/bin"
-      state: "directory"
-      owner: "{{ user_name }}"
-      group: "{{ user_name }}"
-
-  - name: "Setup user bin files"
-    copy:
-      src: "home/user/{{ item }}"
-      dest: "/home/{{ user_name }}/{{ item }}"
-      owner: "{{ user_name }}"
-      group: "{{ user_name }}"
-    with_items:
-    - "bin/linkify"
-
-  - name: "Copy XFCE4 config"
-    copy:
-      src: "home/user/config/xfce4"
-      dest: "/home/{{ user_name }}/.config"
-
-  tags:
-  - config
+    - "{{ os_users }}"
