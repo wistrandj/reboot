@@ -10,8 +10,9 @@
   - guestaddition_version: "5.1.22"
   - vagrant: true
   roles:
-  - base
+  - "base"
+  - "vbox"
+  - "users"
+  - "xfce4"
+  - "vim"
   # - java8
-  - users
-  - vbox
-  - vim
