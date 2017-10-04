@@ -39,10 +39,6 @@
   become_user: "{{ user_name }}"
   register: "r_vimbox"
 
-- debug:
-    msg: "{{ r_vimbox }}"
-
-
 - block:
 
   - name: "create .vim folder"
