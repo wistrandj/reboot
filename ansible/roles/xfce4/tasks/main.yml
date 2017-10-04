@@ -5,11 +5,11 @@
     apt:
       name: "{{ item }}"
       state: "present"
-  become: true
-  with_items:
-  - "xfce4"
-  - "xfce4-terminal"
-  - "lightdm"
+    become: true
+    with_items:
+    - "xfce4"
+    - "xfce4-terminal"
+    - "lightdm"
 
   - name: "Ensure that common config directories exists"
     file:
@@ -22,8 +22,8 @@
 
 
   - name: "Copy common config files"
-    tempalte:
-      src: "./{{ item }}"
+    template:
+      src: "./{{ item }}.j2"
       dest: "{{ item }}"
     become: true
     with_items:
