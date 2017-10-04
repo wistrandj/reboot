@@ -1,10 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+vbox_name = "haptec"
 user_name = "jasu"
 user_password = "vagrant"
-guestadditions_version="5.1.16"
-guestadditions_url = "http://download.virtualbox.org/virtualbox/#{guestadditions_version}/VBoxGuestAdditions_#{guestadditions_version}.iso -O VBoxGuestAdditions_#{guestadditions_version}.iso"
+# guestadditions_version="5.1.16"
+guestadditions_version=´vagrant --version´
 
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
@@ -50,8 +51,8 @@ Vagrant.configure("2") do |config|
   #
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
-    vb.gui = false
-    vb.name = "haptec"
+    vb.gui = true
+    vb.name = vbox_name
   
     # Customize the amount of memory on the VM:
     vb.memory = "4096"
@@ -71,10 +72,11 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-  apt-get update -y
-  apt-get install git
-  cd /opt/
-  git clone https://github.com/jasu0/reboot
-  chmod -Rf /opt/reboot
+  # apt-get update -y
+  # apt-get install git
+  # cd $HOME
+  # git clone https://github.com/jasu0/reboot
+  # chmod -Rf $HOME/reboot
+  echo #{guestadditions_version} >> $HOME/vagrant.version
   SHELL
 end
