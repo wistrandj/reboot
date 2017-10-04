@@ -1,20 +1,20 @@
 ---
 
 - block:
-  - name: "Set apt list"
+  - name: "set apt list"
     copy:
       src: "{{ item }}"
       dest: "/{{ item }}"
     with_items:
     - "etc/apt/sources.list.d/java8-debian.list"
 
-  - name: "Set key file"
+  - name: "set key file"
     apt_key:
       keyserver: "keyserver.ubuntu.com"
       state: "present"
       id: "EEA14886"
 
-  - name: "Install"
+  - name: "install"
     apt:
       name: "{{ item }}"
     with_items:

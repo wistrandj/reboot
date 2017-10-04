@@ -11,7 +11,7 @@
     - "xfce4-terminal"
     - "lightdm"
 
-  - name: "Ensure that common config directories exists"
+  - name: "ensure that common config directories exists"
     file:
       path: "{{ item }}"
       state: "directory"
@@ -21,7 +21,7 @@
     - "/etc/X11/xorg.conf.d/"
 
 
-  - name: "Copy common config files"
+  - name: "copy common config files"
     template:
       src: "./{{ item }}.j2"
       dest: "{{ item }}"
@@ -30,7 +30,7 @@
     - "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
     - "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
 
-  - name: "Copy user specific XFCE4 config"
+  - name: "copy user specific XFCE4 config"
     copy:
       src: "home/user/config/xfce4"
       dest: "/home/{{ item.uname }}/.config"
