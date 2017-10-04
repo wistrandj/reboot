@@ -1,10 +1,15 @@
 ---
 
 - block:
+  # TODO: this sets the same password for all users
+  - name: "mkpasswd"
+    shell: "mkpasswd -m sha-512 {{ os_users[0].pword }}"
+    register: r_hashed_passwd
+
   - name: "create os users"
     user:
       name: "{{ item.uname  }}"
-      password: "{{ item.pword }}"
+      password: "{{ r_hashed_passwd.stdout }}"
       groups: "sudo"
       shell: "/bin/bash"
       state: "present"

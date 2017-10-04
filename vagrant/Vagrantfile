@@ -27,8 +27,10 @@ Vagrant.configure("2") do |config|
   end
   
   config.vm.provision "shell", inline: <<-SHELL
-  apt-get update -y
-  apt-get install -y git
-  git -C /home/vagrant clone https://github.com/jasu0/reboot
+    apt-get update -y
+    apt-get install -y git
+    git -C /home/vagrant clone https://github.com/jasu0/reboot
+    sudo /home/vagrant/reboot/01_install_ansible.sh
+    ansible-playbook /home/vagrant/reboot/ansible/main.yml -K
   SHELL
 end

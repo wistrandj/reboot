@@ -47,6 +47,7 @@
       state: "directory"
       owner: "{{ user_name }}"
       group: "{{ user_name }}"
+      recurse: true
     become: true
     become_user: "{{ user_name }}"
 
@@ -67,6 +68,11 @@
       dest: "/home/{{ user_name }}/.vimrc"
       src: "/home/{{ user_name }}/.vim/bundle/VimBox-rc/vimrc"
       state: "link"
+    become: true
+    become_user: "{{ user_name }}"
+
+  - name: "install plugins"
+    shell: "vim +PluginInstall"
     become: true
     become_user: "{{ user_name }}"
 
