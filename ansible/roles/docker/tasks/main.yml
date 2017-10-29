@@ -37,6 +37,3 @@
       become: true
       with_items:
       - "docker-ce"
-
-  tags:
-  - "docker"

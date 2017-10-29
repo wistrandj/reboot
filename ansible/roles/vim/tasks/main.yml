@@ -27,55 +27,41 @@
       chdir: "/tmp/vim/"
     become: true
 
-  when:
-  - "r_vim.stat.exists == False"
-
-
 # Vim plugins
-
-- stat:
-    path: "/home/{{ user_name }}/.vim/bundle/VimBox-rc"
-  become: true
-  become_user: "{{ user_name }}"
-  register: "r_vimbox"
 
 - block:
 
-  - name: "create .vim folder"
+  - name: "ensure plugin directories exists"
     file:
-      dest: "/home/{{ user_name }}/.vim/bundle"
+      dest: "/home/{{ item.0 }}/{{ item.1 }}"
       state: "directory"
       owner: "{{ user_name }}"
       group: "{{ user_name }}"
       recurse: true
     become: true
     become_user: "{{ user_name }}"
+    with_nested:
+    - "{{ user_name }}"
+    - [".vim", ".vim/bundle"]
 
   - name: "git clone plugins"
     git:
-      repo: "https://github.com/{{ item.user }}/{{ item.repo }}"
-      dest: "/home/{{ user_name }}/.vim/bundle/{{ item.repo }}"
+      repo: "https://github.com/{{ item }}"
+      dest: "/home/{{ user_name }}/.vim/bundle/{{ item | basename }}"
     become: true
     become_user: "{{ user_name }}"
     with_items:
-    - user: "VundleVim"
-      repo: "Vundle.vim"
-    - user: "jasu0"
-      repo: "VimBox-rc"
+    - "{{ vim_plugins }}"
   
   - name: "symlink .vimrc"
     file:
       dest: "/home/{{ user_name }}/.vimrc"
-      src: "/home/{{ user_name }}/.vim/bundle/VimBox-rc/vimrc"
+      src: "/home/{{ user_name }}/.vim/bundle/{{ vimrc_path }}"
       state: "link"
     become: true
     become_user: "{{ user_name }}"
 
   - name: "install plugins"
-    shell: "vim +PluginInstall"
+    shell: "vim +PluginInstall +qa!"
     become: true
     become_user: "{{ user_name }}"
-
-  when:
-  - r_vim.stat.exists == True
-

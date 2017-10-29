@@ -8,10 +8,13 @@
   - user_name: "jasu"
   - password: "password"
   - guestaddition_version: "5.1.22"
-  - vagrant: true
+  - vimrc_path: "vimbox/vimrc"
+  - vim_plugins:
+    - "VundleVim/Vundle.vim"
+    - "jasu0/vimbox"
   roles:
   - "base"
-  - "vbox"
+  - "guest_additions"
   - "users"
   - "xfce4"
   - "vim"
