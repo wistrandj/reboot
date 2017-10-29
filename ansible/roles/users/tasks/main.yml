@@ -1,41 +1,49 @@
 ---
 
+- name: "check if user exists"
+  shell: "getent passwd {{ os_users[0].uname }}"
+  ignore_errors: true
+  register: r_getent_uname
+
 - block:
-  # TODO: this sets the same password for all users
-  - name: "mkpasswd"
-    shell: "mkpasswd -m sha-512 {{ os_users[0].pword }}"
-    register: r_hashed_passwd
 
-  - name: "create os users"
-    user:
-      name: "{{ item.uname  }}"
-      password: "{{ r_hashed_passwd.stdout }}"
-      groups: "sudo"
-      shell: "/bin/bash"
-      state: "present"
-    become: true
-    with_items:
-    - "{{ os_users }}"
+    # TODO: this sets the same password for all users
+    - name: "mkpasswd"
+      shell: "mkpasswd -m sha-512 {{ os_users[0].pword }}"
+      register: r_hashed_passwd
 
-  - name: "setup user dot files"
-    copy:
-      src: "./home/user/{{ item[1] }}"
-      dest: "/home/{{ item[0].uname }}/.{{ item[1] }}"
-      owner: "{{ item[0].uname }}"
-      group: "{{ item[0].uname }}"
-    become: true
-    become_user: "{{ item[0].uname }}"
-    with_nested:
-    - "{{ os_users }}"
-    - ["bash_aliases", "bash_profile", "bashrc", "inputrc", "xinitrc", "Xmodmap"]
+    - name: "create os users"
+      user:
+        name: "{{ item.uname  }}"
+        password: "{{ r_hashed_passwd.stdout }}"
+        groups: "sudo"
+        shell: "/bin/bash"
+        state: "present"
+      become: true
+      with_items:
+      - "{{ os_users }}"
 
-  - name: "create bin directory"
-    file:
-      path: "/home/{{ item.uname }}/bin"
-      state: "directory"
-      owner: "{{ item.uname }}"
-      group: "{{ item.uname }}"
-    become: true
-    become_user: "{{ item.uname }}"
-    with_items:
-    - "{{ os_users }}"
+    - name: "setup user dot files"
+      copy:
+        src: "./home/user/{{ item[1] }}"
+        dest: "/home/{{ item[0].uname }}/.{{ item[1] }}"
+        owner: "{{ item[0].uname }}"
+        group: "{{ item[0].uname }}"
+      become: true
+      become_user: "{{ item[0].uname }}"
+      with_nested:
+      - "{{ os_users }}"
+      - ["bash_aliases", "bash_profile", "bashrc", "inputrc", "xinitrc", "Xmodmap"]
+
+    - name: "create bin directory"
+      file:
+        path: "/home/{{ item.uname }}/bin"
+        state: "directory"
+        owner: "{{ item.uname }}"
+        group: "{{ item.uname }}"
+      become: true
+      become_user: "{{ item.uname }}"
+      with_items:
+      - "{{ os_users }}"
+
+  when: r_getent_uname.rc != 0

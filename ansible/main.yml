@@ -3,7 +3,7 @@
   hosts: localhost
   vars:
   - os_users:
-    - uname: "jasu"
+    - uname: "jasu0"
       pword: "password"
   - guestaddition_version: "5.1.22"
   - vimrc_path: "vimbox/vimrc"
