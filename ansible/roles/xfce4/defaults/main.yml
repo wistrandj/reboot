@@ -1,2 +1,7 @@
 ---
-# defaults file for xfce4
+
+xfce4_packages:
+- "xfce4"
+- "xfce4-terminal"
+- "lightdm"
+xfce4_packages_additional: []

@@ -1,2 +1,7 @@
 ---
-# defaults file for vim
+
+vimrc_path: "vimbox/vimrc"
+vim_plugins:
+- "VundleVim/Vundle.vim"
+- "jasu0/vimbox"
+vim_plugins_additional: []

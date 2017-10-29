@@ -7,19 +7,17 @@
       state: "present"
     become: true
     with_items:
-    - "xfce4"
-    - "xfce4-terminal"
-    - "lightdm"
+    - "{{ xfce4_packages }}"
+    - "{{ xfce4_packages_additional }}"
 
   - name: "ensure that common config directories exists"
     file:
-      path: "{{ item }}"
+      path: "{{ item | dirname }}"
       state: "directory"
     become: true
     with_items:
-    - "/etc/lightdm/lightdm.conf.d"
-    - "/etc/X11/xorg.conf.d/"
-
+    - "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
+    - "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
 
   - name: "copy common config files"
     template:

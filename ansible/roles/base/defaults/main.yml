@@ -1,2 +1,11 @@
 ---
-# defaults file for common
+
+base_packages:
+- "gcc"
+- "git"
+- "make"
+- "screen"
+- "sed"
+- "tree"
+- "wget"
+base_packages_additional: []

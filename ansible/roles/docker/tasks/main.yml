@@ -9,20 +9,18 @@
         state: "present"
       become: true
       with_items:
-      - "apt-transport-https"
-      - "ca-certificates"
-      - "curl"
-      - "gnupg2"
-      - "software-properties-common"
+      - "{{ docker_packages }}"
+      - "{{ docker_packages_additional }}"
 
     - name: "fetch Docker GPG key"
       apt_key:
-        id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
-        url: "{{ item }}"
+        id: "{{ item.id }}"
+        url: "{{ item.url }}"
         state: "present"
       become: true
       with_items:
-      - "https://download.docker.com/linux/debian/gpg"
+      - url: "https://download.docker.com/linux/debian/gpg"
+        id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
 
     - name: "add apt repository"
       apt_repository:

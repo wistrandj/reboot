@@ -52,6 +52,7 @@
     become_user: "{{ os_users[0].uname }}"
     with_items:
     - "{{ vim_plugins }}"
+    - "{{ vim_plugins_additional }}"
 
   - name: "symlink .vimrc"
     file:

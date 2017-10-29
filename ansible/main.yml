@@ -3,13 +3,9 @@
   hosts: localhost
   vars:
   - os_users:
-    - uname: "jasu0"
+    - uname: "jasu"
       pword: "password"
   - guestaddition_version: "5.1.22"
-  - vimrc_path: "vimbox/vimrc"
-  - vim_plugins:
-    - "VundleVim/Vundle.vim"
-    - "jasu0/vimbox"
   roles:
   - "base"
   - "guest_additions"
