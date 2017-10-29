@@ -1,0 +1,42 @@
+---
+# tasks file for docker
+
+- block:
+
+    - name: "install prerequisities"
+      apt:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items:
+      - "apt-transport-https"
+      - "ca-certificates"
+      - "curl"
+      - "gnupg2"
+      - "software-properties-common"
+
+    - name: "fetch Docker GPG key"
+      apt_key:
+        id: "9DC858229FC7DD38854AE2D88D81803C0EBFCD88"
+        url: "{{ item }}"
+        state: "present"
+      become: true
+      with_items:
+      - "https://download.docker.com/linux/debian/gpg"
+
+    - name: "add apt repository"
+      apt_repository:
+         repo: "deb [arch=amd64] https://download.docker.com/linux/debian jessie stable"
+         state: "present"
+      become: true
+
+    - name: "install"
+      apt:
+        name: "{{ item }}"
+        state: "present"
+      become: true
+      with_items:
+      - "docker-ce"
+
+  tags:
+  - "docker"
