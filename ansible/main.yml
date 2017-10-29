@@ -5,8 +5,6 @@
   - os_users:
     - uname: "jasu"
       pword: "password"
-  - user_name: "jasu"
-  - password: "password"
   - guestaddition_version: "5.1.22"
   - vimrc_path: "vimbox/vimrc"
   - vim_plugins:
