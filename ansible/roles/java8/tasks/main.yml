@@ -5,6 +5,7 @@
     copy:
       src: "{{ item }}"
       dest: "/{{ item }}"
+    become: true
     with_items:
     - "etc/apt/sources.list.d/java8-debian.list"
 
@@ -13,10 +14,12 @@
       keyserver: "keyserver.ubuntu.com"
       state: "present"
       id: "EEA14886"
+    become: true
 
   - name: "install"
     apt:
       name: "{{ item }}"
+    become: true
     with_items:
       - "oracle-java8-installer"
       - "oracle-java8-set-default"
