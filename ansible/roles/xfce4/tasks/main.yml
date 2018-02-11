@@ -1,38 +1,14 @@
 ---
 
 - block:
-  - name: "install base packages"
+  - name: "install basepackages"
     apt:
-      name: "{{ item }}"
+      name: "{{ item }}"
       state: "present"
     become: true
     with_items:
-    - "{{ xfce4_packages }}"
-    - "{{ xfce4_packages_additional }}"
+    - "{{ window_manager_packages[window_manager] | default([]) }}"
+    - "{{ window_manager_packages_additional[window_manager] | default([]) }}"
 
-  - name: "ensure that common config directories exists"
-    file:
-      path: "{{ item | dirname }}"
-      state: "directory"
-    become: true
-    with_items:
-    - "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
-    - "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
-
-  - name: "copy common config files"
-    template:
-      src: "./{{ item }}.j2"
-      dest: "{{ item }}"
-    become: true
-    with_items:
-    - "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
-    - "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
-
-  - name: "copy user specific XFCE4 config"
-    copy:
-      src: "home/user/config/xfce4"
-      dest: "/home/{{ item.uname }}/.config"
-    become: true
-    become_user: "{{ item.uname }}"
-    with_items:
-    - "{{ os_users }}"
+  - name: "post-configure window manager"
+    include_tasks: "deploy-{{ window_manager }}.yml"

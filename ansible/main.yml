@@ -2,9 +2,6 @@
 - name: Setup basic tools for fresh OS
   hosts: localhost
   vars:
-  - os_users:
-    - uname: "jasu"
-      pword: "password"
   - guestaddition_version: "5.1.22"
   roles:
   - "base"

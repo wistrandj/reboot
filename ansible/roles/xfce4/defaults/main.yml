@@ -1,7 +1,9 @@
 ---
 
-xfce4_packages:
-- "xfce4"
-- "xfce4-terminal"
-- "lightdm"
-xfce4_packages_additional: []
+window_manager_packages:
+  xfce4:
+  - "xfce4"
+  - "xfce4-terminal"
+  - "lightdm"
+window_manager_packages_additional:
+  xfce4: []

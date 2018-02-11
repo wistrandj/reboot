@@ -33,36 +33,36 @@
 
   - name: "ensure plugin directories exists"
     file:
-      dest: "/home/{{ item.0 }}/{{ item.1 }}"
+      dest: "/home/{{ os_user_uname }}/{{ item }}"
       state: "directory"
-      owner: "{{ os_users[0].uname }}"
-      group: "{{ os_users[0].uname }}"
+      owner: "{{ os_user_uname }}"
+      group: "{{ os_user_uname }}"
       recurse: true
     become: true
-    become_user: "{{ os_users[0].uname }}"
+    become_user: "{{ os_user_uname }}"
     with_nested:
-    - "{{ os_users[0].uname }}"
+    - "{{ os_user_uname }}"
     - [".vim", ".vim/bundle"]
 
   - name: "git clone plugins"
     git:
       repo: "https://github.com/{{ item }}"
-      dest: "/home/{{ os_users[0].uname }}/.vim/bundle/{{ item | basename }}"
+      dest: "/home/{{ os_user_uname }}/.vim/bundle/{{ item | basename }}"
     become: true
-    become_user: "{{ os_users[0].uname }}"
+    become_user: "{{ os_user_uname }}"
     with_items:
     - "{{ vim_plugins }}"
     - "{{ vim_plugins_additional }}"
 
   - name: "symlink .vimrc"
     file:
-      dest: "/home/{{ os_users[0].uname }}/.vimrc"
-      src: "/home/{{ os_users[0].uname }}/.vim/bundle/{{ vimrc_path }}"
+      dest: "/home/{{ os_user_uname }}/.vimrc"
+      src: "/home/{{ os_user_uname }}/.vim/bundle/{{ vimrc_path }}"
       state: "link"
     become: true
-    become_user: "{{ os_users[0].uname }}"
+    become_user: "{{ os_user_uname }}"
 
   - name: "install plugins"
     shell: "vim +PluginInstall +qa!"
     become: true
-    become_user: "{{ os_users[0].uname }}"
+    become_user: "{{ os_user_uname }}"
