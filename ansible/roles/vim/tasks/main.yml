@@ -40,9 +40,9 @@
       recurse: true
     become: true
     become_user: "{{ os_user_uname }}"
-    with_nested:
-    - "{{ os_user_uname }}"
-    - [".vim", ".vim/bundle"]
+    with_items:
+    - ".vim"
+    - ".vim/bundle"
 
   - name: "git clone plugins"
     git:
