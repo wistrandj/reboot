@@ -42,6 +42,23 @@
       state: "directory"
     become: true
 
+  - name: "ensure samba users exists"
+    user:
+      name: "{{ item }}"
+    with_items:
+    - "{{ samba_users | json_query('[].name') }}"
+
+  - name: "ensure shared directory exists"
+    file:
+      path: "{{ item }}"
+      state: "directory"
+      owner: "nobody"
+      group: "nogroup"
+      mode: 02777
+    become: true
+    with_items:
+    - "{{ samba_home }}/shared"
+
   - name: "ensure user directories exists"
     file:
       path: "{{ samba_home }}/{{ item }}"
@@ -50,12 +67,6 @@
       group: "{{ item }}"
       mode: 02770
     become: true
-    with_items:
-    - "{{ samba_users | json_query('[].name') }}"
-
-  - name: "ensure samba users exists"
-    user:
-      name: "{{ item }}"
     with_items:
     - "{{ samba_users | json_query('[].name') }}"
 

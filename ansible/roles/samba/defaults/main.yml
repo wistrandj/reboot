@@ -9,9 +9,7 @@ samba_daemon: 'smbd'
 samba_packages_additional: []
 
 
-samba_users:
-- name: 'jasse'
-  uid: 5001
+samba_users: []
 samba_shared: false
-samba_printer: true
-samba_path: '/samba'
+samba_printer: false
+samba_path: '/home/samba'

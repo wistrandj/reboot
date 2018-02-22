@@ -1,0 +1,6 @@
+---
+
+samba_home: '/data1/samba'
+samba_users: []
+samba_shared: false
+samba_printer: true
