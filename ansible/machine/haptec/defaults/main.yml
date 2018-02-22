@@ -1,0 +1,7 @@
+---
+
+samba_home: '/data1/samba'
+
+backup_source: '/data1'
+backup_target: '/data2'
+backup_exclude: []

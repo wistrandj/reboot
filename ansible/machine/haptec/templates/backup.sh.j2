@@ -1,0 +1,56 @@
+#!/bin/bash
+
+NOW=$(date +%Y%m%d-%H%M)
+ORIGINAL_DIR="/data1"
+BACKUP_DIR="/data2/backup"
+INFO="/data2/backup.info.json"
+
+SNAPSHOTS_DIR="$BACKUP_DIR/snapshots"
+ARCHIVES_DIR="$BACKUP_DIR/archives"
+CURRENT=$BACKUP_DIR/current
+
+GPG_HOMEDIR="/home/jasu/.gnupg/"
+
+NEXT_SNAPSHOT=$SNAPSHOTS_DIR/snapshot.$NOW
+NEXT_ARCHIVE=$ARCHIVES_DIR/archive.$NOW.tar.gz
+
+[[ ! -e $CURRENT ]] && ln -sn $SNAPSHOTS_DIR/$(ls -1 $SNAPSHOTS_DIR | sort -r | head -n 1) $CURRENT 
+
+mkdir -p $SNAPSHOTS_DIR
+mkdir -p $ARCHIVES_DIR
+
+for action in "$@"
+do
+
+case "$action"
+in
+
+backup)
+echo "backing up..."
+mkdir -p $NEXT_SNAPSHOT
+rsync -azH --exclude=lost+found --link-dest=$CURRENT $ORIGINAL_DIR/ $NEXT_SNAPSHOT && ln -snf $NEXT_SNAPSHOT $CURRENT
+
+last_backup=$(readlink /data2/backup/current | xargs -i basename {})
+echo "{\"backups\": {\"snapshot\": \"$last_backup\", \"archive\": \"\"}}" > $INFO
+;;
+
+clear-snapshots)
+echo "Removing over two weeks old snapshots"
+rm -rf $(ls -d1 $SNAPSHOTS_DIR/* | sort -r | tail -n +15)
+;;
+
+archive)
+echo "Archiving..."
+last_backup=$(readlink /data2/backup/current)
+tar zcf $NEXT_ARCHIVE -C $last_backup .
+;;
+
+encrypt)
+echo "encrypting... (or not)"
+# gpg --homedir=$GPG_HOMEDIR -e $NEXT_ARCHIVE
+;;
+
+esac
+
+
+done

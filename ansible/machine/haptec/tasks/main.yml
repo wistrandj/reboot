@@ -1,0 +1,13 @@
+---
+
+# TODO
+
+- block:
+  - name: "create backup directories"
+    file:
+      path: "{{ backup_target }}/{{ item }}"
+      state: "directory"
+    become: true
+    with_items:
+    - "snapshots"
+    - "archives"

@@ -1,0 +1,5 @@
+---
+- name: "setup a home server"
+  hosts: "haptec"
+  roles:
+  - "machine/haptec"
