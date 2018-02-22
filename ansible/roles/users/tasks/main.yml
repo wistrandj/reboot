@@ -1,7 +1,7 @@
 ---
 
 - name: "check if user exists"
-  shell: "getent passwd {{ os_user_uname.uname }}"
+  shell: "getent passwd {{ os_user_uname }}"
   ignore_errors: true
   register: r_getent_uname
 

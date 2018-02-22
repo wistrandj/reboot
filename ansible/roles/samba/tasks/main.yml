@@ -1,0 +1,94 @@
+---
+
+# TODO - create users
+
+- block:
+  - name: "stop service"
+    service:
+      name: "{{ samba_daemon }}"
+      state: "stopped"
+      enabled: true
+    become: true
+
+  tags:
+  - "service-install-samba"
+  - "service-stop-samba"
+  - "service-configure-samba"
+
+
+- block:
+  - name: "install packages"
+    apt:
+      name: "{{ item }}"
+      state: "present"
+    become: true
+    with_items:
+    - "{{ samba_packages }}"
+    - "{{ samba_packages_additional }}"
+
+  - name: "ensure users exists"
+    user:
+      name: "{{ item.name }}"
+      state: "present"
+      uid: "{{ item.uid }}"
+      shell: "/bin/false"
+    become: true
+    with_items:
+    - "{{ samba_users }}"
+
+  - name: "ensure samba home directory exists"
+    file:
+      path: "{{ samba_home }}"
+      state: "directory"
+    become: true
+
+  - name: "ensure user directories exists"
+    file:
+      path: "{{ samba_home }}/{{ item }}"
+      state: "directory"
+      owner: "{{ item }}"
+      group: "{{ item }}"
+      mode: 02770
+    become: true
+    with_items:
+    - "{{ samba_users | json_query('[].name') }}"
+
+  - name: "ensure samba users exists"
+    user:
+      name: "{{ item }}"
+    with_items:
+    - "{{ samba_users | json_query('[].name') }}"
+
+  - name: "configure samba"
+    template:
+      src: "./{{ item }}.j2"
+      dest: "{{ item }}"
+    become: true
+    with_items:
+    - "/etc/samba/smb.conf"
+
+  - name: "configure avahi"
+    template:
+      src: "./{{ item }}.j2"
+      dest: "{{ item }}"
+    become: true
+    with_items:
+    - "/etc/avahi/services/samba.service"
+
+  tags:
+  - "service-configure-samba"
+  - "service-restart-samba"
+  - "service-install-samba"
+
+- block:
+  - name: "start service"
+    service:
+      name: "{{ samba_daemon }}"
+      state: "started"
+      enabled: true
+    become: true
+
+  tags:
+  - "service-configure-samba"
+  - "service-install-samba"
+  - "service-restart-samba"

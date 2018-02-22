@@ -1,0 +1,17 @@
+---
+
+samba_packages:
+- "samba"
+- "smbclient"
+- "avahi-daemon"
+- "avahi-utils"
+samba_daemon: 'smbd'
+samba_packages_additional: []
+
+
+samba_users:
+- name: 'jasse'
+  uid: 5001
+samba_shared: false
+samba_printer: true
+samba_path: '/samba'
