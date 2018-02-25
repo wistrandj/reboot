@@ -1,0 +1,126 @@
+---
+
+- block:
+  - name: "stop gogs"
+    service:
+      name: "{{ gogs_daemon }}"
+      state: "stopped"
+    become: true
+    failed_when: false
+
+  - name: "wait for service to stop"
+    wait_for:
+      port: 3000
+      delay: 10
+      state: "absent"
+  tags:
+  - "service-stop"
+  - "service-configure"
+  - "service-restart"
+  - "service-install"
+
+- block:
+  - name: "install packages"
+    apt:
+      name: "{{ item }}"
+      state: "present"
+    become: true
+    with_items:
+    - "{{ gogs_packages }}"
+
+  - name: "ensure gogs user exists"
+    user:
+      name: "{{ gogs_user }}"
+      shell: "/bin/false"
+      createhome: false
+    become: true
+
+  - name: "ensure postgres user exists"
+    postgresql_user:
+      name: "{{ gogs_dbuname }}"
+      password: "{{ gogs_dbuname }}"
+      role_attr_flags: LOGIN
+    become: true
+    become_user: "postgres"
+    vars:
+      ansible_ssh_pipelining: true
+
+  - name: "ensure database exists"
+    postgresql_db:
+      name: "{{ gogs_dbname }}"
+      owner: "{{ gogs_dbuname }}"
+    become: true
+    become_user: "postgres"
+    vars:
+      ansible_ssh_pipelining: true
+
+  - name: "create directories"
+    file: 
+      path: "{{ gogs_home }}"
+      state: "directory"
+      owner: "{{ gogs_user }}"
+      group: "{{ gogs_user }}"
+    become: true
+    with_items:
+    - "{{ gogs_home }}"
+    - "{{ gogs_git }}"
+
+
+  tags:
+  - "service-stop"
+  - "service-configure"
+  - "service-restart"
+  - "service-install"
+
+- block:
+  - block:
+    - name: "download binary"
+      uri:
+        url: "{{ gogs_url }}"
+        dest: "/tmp/{{ gogs_url | basename }}"
+
+    - name: "remove old binary"
+      file: 
+        path: "{{ gogs_home }}"
+        state: "absent"
+      become: true
+
+    - name: "unarchive binary"
+      unarchive: 
+        src: "/tmp/{{ gogs_url | basename }}"
+        dest: "{{ gogs_home | dirname }}"
+        owner: "{{ gogs_user }}"
+        group: "{{ gogs_user }}"
+      become: true
+
+    when: gogs_deploy is defined
+
+  - name: "setup systemd service file"
+    template:
+      src: "./{{ item }}.j2"
+      dest: "{{ item }}"
+    become: true
+    with_items:
+    - "/etc/systemd/system/gogs.service"
+
+  - name: "reload systemd configuration"
+    systemd:
+      daemon_reload: true
+    become: true
+
+- block:
+  - name: "start gogs"
+    service:
+      name: "{{ gogs_daemon }}"
+      state: "started"
+    become: true
+
+  - name: "wait for"
+    wait_for:
+      port: 3000
+      delay: 10
+      state: "present"
+  tags:
+  - "service-configure"
+  - "service-restart"
+  - "service-install"

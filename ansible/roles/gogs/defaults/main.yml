@@ -1,0 +1,16 @@
+---
+
+gogs_packages:
+- "python-psycopg2"
+
+gogs_user: "gogs"
+gogs_daemon: "gogs"
+gogs_home: "/opt/gogs"
+gogs_git: "/opt/gogs/git"
+gogs_url: "https://dl.gogs.io/0.11.34/linux_amd64.zip"
+
+gogs_dbhost: "localhost"
+gogs_dbport: 5432
+gogs_dbname: "gogs"
+gogs_dbuname: "gogs"
+gogs_dbpword: "gogs"

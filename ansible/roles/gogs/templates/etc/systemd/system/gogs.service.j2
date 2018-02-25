@@ -1,0 +1,18 @@
+[Unit]
+Description=Gogs
+After=syslog.target
+After=network.target
+After=postgresql.target
+# After=nginx.target
+
+[Service]
+Type=simple
+User={{ gogs_user }}
+Group={{ gogs_user }}
+WorkingDirectory={{ gogs_home }}
+Restart=always
+Environment=USER={{ gogs_user }} HOME={{ gogs_home }}
+ExecStart={{ gogs_home }}/gogs web
+
+[Install]
+WantedBy=multi.user.target

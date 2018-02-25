@@ -2,5 +2,7 @@
 
 samba_home: '/data1/samba'
 samba_users: []
-samba_shared: false
+samba_shared: true
 samba_printer: true
+
+gogs_git: "/data1/git"
