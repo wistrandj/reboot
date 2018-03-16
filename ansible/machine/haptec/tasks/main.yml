@@ -1,13 +1,41 @@
 ---
 
-# TODO
-
 - block:
   - name: "create backup directories"
     file:
       path: "{{ backup_target }}/{{ item }}"
       state: "directory"
+      owner: "root"
+      group: "root"
+      mode: 0700
     become: true
     with_items:
     - "snapshots"
     - "archives"
+
+  - name: "create directory for executable"
+    file:
+      path: "{{ item | dirname }}"
+      state: "directory"
+    become: true
+    with_items:
+    - "/opt/bin/backup.sh"
+
+  - name: "copy backup.sh"
+    template:
+      src: "./{{ item }}.j2"
+      dest: "{{ item }}"
+      mode: 0544
+    become: true
+    with_items:
+    - "/opt/bin/backup.sh"
+
+  - name: "timer backup"
+    cron:
+      name: "backup data directory"
+      job: "/opt/bin/backup.sh backup"
+      minute: 30
+      hour: 5
+      weekday: 0
+      user: "root"
+    become: true

@@ -1,15 +1,15 @@
 #!/bin/bash
 
 NOW=$(date +%Y%m%d-%H%M)
-ORIGINAL_DIR="/data1"
-BACKUP_DIR="/data2/backup"
-INFO="/data2/backup.info.json"
+ORIGINAL_DIR="{{ backup_source }}"
+BACKUP_DIR="{{ backup_target }}"
+INFO="{{ backup_info }}"
 
 SNAPSHOTS_DIR="$BACKUP_DIR/snapshots"
 ARCHIVES_DIR="$BACKUP_DIR/archives"
 CURRENT=$BACKUP_DIR/current
 
-GPG_HOMEDIR="/home/jasu/.gnupg/"
+GPG_HOMEDIR="/home/undefined"
 
 NEXT_SNAPSHOT=$SNAPSHOTS_DIR/snapshot.$NOW
 NEXT_ARCHIVE=$ARCHIVES_DIR/archive.$NOW.tar.gz
@@ -30,7 +30,7 @@ echo "backing up..."
 mkdir -p $NEXT_SNAPSHOT
 rsync -azH --exclude=lost+found --link-dest=$CURRENT $ORIGINAL_DIR/ $NEXT_SNAPSHOT && ln -snf $NEXT_SNAPSHOT $CURRENT
 
-last_backup=$(readlink /data2/backup/current | xargs -i basename {})
+last_backup=$(readlink $CURRENT | xargs -i basename {})
 echo "{\"backups\": {\"snapshot\": \"$last_backup\", \"archive\": \"\"}}" > $INFO
 ;;
 
@@ -41,7 +41,7 @@ rm -rf $(ls -d1 $SNAPSHOTS_DIR/* | sort -r | tail -n +15)
 
 archive)
 echo "Archiving..."
-last_backup=$(readlink /data2/backup/current)
+last_backup=$(readlink $CURRENT)
 tar zcf $NEXT_ARCHIVE -C $last_backup .
 ;;
 
