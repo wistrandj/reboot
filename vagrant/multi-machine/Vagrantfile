@@ -1,46 +1,66 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+def define_vmachine(config, vbox_name, ssh_keys, &block)
+  ssh_keys.push("./.vagrant/machines/#{vbox_name}/virtualbox/private_key")
+  config.vm.define(vbox_name, &block)
+end
+
 Vagrant.configure("2") do |config|
 
-  config.vm.define "master" do |node|
-    node.vm.box = "debian/stretch64"
-    node.vm.network "private_network", type: "dhcp"
-    node.vm.network "public_network", ip: "10.1.1.100"
+  generated_keys = []
 
-    node.vm.provider "virtualbox" do |vb|
-      vb.name = "master"
+  define_vmachine config, "master", generated_keys do |node|
+    vbox_name = "master"
+    node.vm.box = "debian/stretch64"
+    node.vm.network :private_network, type: "dhcp"
+    node.vm.network :public_network, ip: "10.1.1.100"
+
+    node.vm.provider :virtualbox do |vb|
+      vb.name = vbox_name
       vb.gui = false
       vb.memory = "1024"
     end
 
+    node.vm.provision "shell", inline: "hostname #{vbox_name}; echo #{vbox_name} > /etc/hostname"
+
   end
 
-  config.vm.define "worker" do |node|
+  define_vmachine config, "worker", generated_keys do |node|
+    vbox_name = "worker"
     node.vm.box = "debian/stretch64"
-    node.vm.network "private_network", type: "dhcp"
-    node.vm.network "public_network", ip: "10.1.1.101"
+    node.vm.network :private_network, type: "dhcp"
+    node.vm.network :public_network, ip: "10.1.1.101"
 
-    node.vm.provider "virtualbox" do |vb|
-      vb.name = "worker"
+    node.vm.provider :virtualbox do |vb|
+      vb.name = vbox_name
       vb.gui = false
       vb.memory = "1024"
     end
 
-  end
+    node.vm.provision "shell", inline: "hostname #{vbox_name}; echo #{vbox_name} > /etc/hostname"
 
-  # Generate ssh keys
-  # $ ssh-keygen.exe -f keys/private_key -t rsa
-  # $ ssh-keygen.exe -f keys/private_key -y > keys/public_key
-  config.ssh.insert_key = true
-  config.ssh.private_key_path = ["keys/private_key"]
-  config.vm.provision "file", source: "keys/public_key", destination: "/home/vagrant/.ssh/authorized_keys"
-  config.vm.provision "file", source: "keys/public_key", destination: "/home/vagrant/.ssh/id_rsa.pub"
-  config.vm.provision "file", source: "keys/private_key", destination: "/home/vagrant/.ssh/id_rsa"
-  config.vm.provision "shell", inline: "chmod 0500 /home/vagrant/.ssh/id_rsa"
+  end
 
   # config.vm.provision "shell", inline: <<-SHELL
   #   apt-get update
   #   debian_frontend=noninteractive apt-get install -y vim curl wget tree screen console-data
   # SHELL
+
+  if File.file?("./keys/id_rsa")
+    # Generate SSH keys with following commands
+    # HACK: Start using custom key only if all boxes has been provisioned once successfully
+    # ssh-keygen.exe -f keys/id_rsa -t rsa
+    # ssh-keygen.exe -f keys/id_rsa -y > keys/public_key
+
+    if generated_keys.reject{ |private_key| File.file?(private_key)}.length == 0
+      config.ssh.private_key_path = "./keys/id_rsa"
+    end
+
+    config.ssh.insert_key = false
+    config.vm.provision "file", source: "keys/id_rsa.pub", destination: "/home/vagrant/.ssh/authorized_keys"
+    config.vm.provision "file", source: "keys/id_rsa.pub", destination: "/home/vagrant/.ssh/id_rsa.pub"
+    config.vm.provision "file", source: "keys/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
+    config.vm.provision "shell", inline: "chmod 0500 /home/vagrant/.ssh/id_rsa"
+  end
 end
