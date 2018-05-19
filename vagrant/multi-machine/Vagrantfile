@@ -5,35 +5,42 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "master" do |node|
     node.vm.box = "debian/stretch64"
-    node.vm.network "private_network", ip: "10.1.1.1"
-    node.vm.network "public_network"
+    node.vm.network "private_network", type: "dhcp"
+    node.vm.network "public_network", ip: "10.1.1.100"
+
     node.vm.provider "virtualbox" do |vb|
       vb.name = "master"
       vb.gui = false
-      vb.memory = "2048"
+      vb.memory = "1024"
     end
+
   end
 
-  config.vm.define "slave" do |node|
+  config.vm.define "worker" do |node|
     node.vm.box = "debian/stretch64"
-    node.vm.network "private_network", ip: "10.1.1.2"
-    node.vm.network "public_network"
+    node.vm.network "private_network", type: "dhcp"
+    node.vm.network "public_network", ip: "10.1.1.101"
+
     node.vm.provider "virtualbox" do |vb|
-      vb.name = "slave"
+      vb.name = "worker"
       vb.gui = false
-      vb.memory = "2048"
+      vb.memory = "1024"
     end
+
   end
 
-  # Generate SSH keys
+  # Generate ssh keys
   # $ ssh-keygen.exe -f keys/private_key -t rsa
   # $ ssh-keygen.exe -f keys/private_key -y > keys/public_key
+  config.ssh.insert_key = true
+  config.ssh.private_key_path = ["keys/private_key"]
   config.vm.provision "file", source: "keys/public_key", destination: "/home/vagrant/.ssh/authorized_keys"
+  config.vm.provision "file", source: "keys/public_key", destination: "/home/vagrant/.ssh/id_rsa.pub"
   config.vm.provision "file", source: "keys/private_key", destination: "/home/vagrant/.ssh/id_rsa"
-  config.vm.provision "file", source: "keys/private_key", destination: "/home/vagrant/.ssh/id_rsa.pub"
+  config.vm.provision "shell", inline: "chmod 0500 /home/vagrant/.ssh/id_rsa"
 
-  config.vm.provision "shell", inline: <<-SHELL
-    apt-get update
-    DEBIAN_FRONTEND=noninteractive apt-get install -y vim curl wget tree screen console-data
-  SHELL
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   apt-get update
+  #   debian_frontend=noninteractive apt-get install -y vim curl wget tree screen console-data
+  # SHELL
 end
