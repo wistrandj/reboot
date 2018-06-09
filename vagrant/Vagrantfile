@@ -1,36 +1,85 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-vbox_name = "hoptec"
-user_name = "jasu"
-user_password = "vagrant"
-guestadditions_version="5.1.16"
-# guestadditions_version=`vboxmanage --version | cut -d' ' -f 2`
+def define_vmachine(config, vbox_name, ssh_keys, &block)
+  ssh_keys.push("./.vagrant/machines/#{vbox_name}/virtualbox/private_key")
+  config.vm.define(vbox_name, &block)
+end
+
+def etc_hosts(hosts)
+  hosts_lines = ""
+  hosts.each do |host|
+    hosts_lines = hosts_lines + "#{host[1]} #{host[0]}\n"
+  end
+  return hosts_lines
+end
 
 Vagrant.configure("2") do |config|
-  # NOTE: You must have vagrant-vbguest plugin installed for Debian
-  # $ vagrant plugin install vagrant-vbguest
-  config.vm.box = "debian/jessie64"
-  # config.vm.box_check_update = false
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
-  # config.vm.network "private_network", ip: "192.168.33.10"
-  # config.vm.network "public_network"
-  # config.vm.synced_folder "C:/Users/jasu/Desktop/shared", "/shared"
 
-  config.vm.provider "virtualbox" do |vb|
-    # Display the VirtualBox GUI when booting the machine
-    vb.gui = true
-    vb.name = vbox_name
-  
-    # Customize the amount of memory on the VM:
-    vb.memory = "4096"
+  generated_keys = []
+  hosts = {
+    "master": "10.1.1.100",
+    "worker": "10.1.1.101",
+  }
+
+  define_vmachine config, "master", generated_keys do |node|
+    vbox_name = "master"
+    node.vm.box = "debian/stretch64"
+    node.vm.network :private_network, type: "dhcp"
+    node.vm.network :public_network, ip: hosts[vbox_name]
+
+    node.vm.provider :virtualbox do |vb|
+      vb.name = vbox_name
+      vb.gui = false
+      vb.memory = "1024"
+    end
+
+    node.vm.provision "shell", inline: <<-SHELL
+      hostname #{vbox_name}
+      echo "#{vbox_name}" > /etc/hostname
+      echo "#{etc_hosts(hosts)}" >> /etc/hosts
+    SHELL
+
   end
-  
-  config.vm.provision "shell", inline: <<-SHELL
-    apt-get update -y
-    apt-get install -y git
-    git -C /home/vagrant clone https://github.com/jasu0/reboot
-    sudo /home/vagrant/reboot/01_install_ansible.sh
-    ansible-playbook /home/vagrant/reboot/ansible/main.yml -K
-  SHELL
+
+  define_vmachine config, "worker", generated_keys do |node|
+    vbox_name = "worker"
+    node.vm.box = "debian/stretch64"
+    node.vm.network :private_network, type: "dhcp"
+    node.vm.network :public_network, ip: hosts[vbox_name]
+
+    node.vm.provider :virtualbox do |vb|
+      vb.name = vbox_name
+      vb.gui = false
+      vb.memory = "1024"
+    end
+
+    node.vm.provision "shell", inline: <<-SHELL
+      hostname #{vbox_name}
+      echo "#{vbox_name}" > /etc/hostname
+      echo "#{etc_hosts(hosts)}" >> /etc/hosts
+    SHELL
+
+  end
+
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   apt-get update
+  #   debian_frontend=noninteractive apt-get install -y vim curl wget tree screen console-data
+  # SHELL
+
+  if File.file?("./keys/id_rsa")
+    # Generate SSH keys with following commands
+    # HACK: Start using custom key only if all boxes has been provisioned once successfully
+    # ssh-keygen.exe -f keys/id_rsa -t rsa
+
+    # if generated_keys.reject{ |private_key| File.file?(private_key)}.length == 0
+    # config.ssh.private_key_path = "./keys/id_rsa"
+    # end
+
+    config.ssh.insert_key = false
+    config.vm.provision "file", source: "keys/id_rsa.pub", destination: "/home/vagrant/.ssh/authorized_keys"
+    config.vm.provision "file", source: "keys/id_rsa.pub", destination: "/home/vagrant/.ssh/id_rsa.pub"
+    config.vm.provision "file", source: "keys/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
+    config.vm.provision "shell", inline: "chmod 0500 /home/vagrant/.ssh/id_rsa"
+  end
 end
