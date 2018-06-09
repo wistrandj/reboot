@@ -1,11 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-def define_vmachine(config, vbox_name, ssh_keys, &block)
-  ssh_keys.push("./.vagrant/machines/#{vbox_name}/virtualbox/private_key")
-  config.vm.define(vbox_name, &block)
-end
-
 def etc_hosts(hosts)
   hosts_lines = ""
   hosts.each do |host|
@@ -16,18 +11,17 @@ end
 
 Vagrant.configure("2") do |config|
 
-  generated_keys = []
   hosts = {
     "master": "10.1.1.100",
-    "database": "10.1.1.101",
-    "geoworker": "10.1.1.102",
+    "worker": "10.1.1.101",
   }
+  possible_ssh_keys = ["./keys/id_rsa", "C:/Users/#{ENV['USERNAME']}/.vagrant.d/insecure_private_key"]
 
-  define_vmachine config, "master", generated_keys do |node|
+  config.vm.define "master" do |node|
     vbox_name = "master"
     node.vm.box = "debian/stretch64"
     node.vm.network :private_network, type: "dhcp"
-    node.vm.network :public_network, ip: hosts[vbox_name]
+    node.vm.network :public_network, ip: "10.1.1.100"
 
     node.vm.provider :virtualbox do |vb|
       vb.name = vbox_name
@@ -43,31 +37,11 @@ Vagrant.configure("2") do |config|
 
   end
 
-  define_vmachine config, "database", generated_keys do |node|
-    vbox_name = "database"
+  config.vm.define "worker" do |node|
+    vbox_name = "worker"
     node.vm.box = "debian/stretch64"
     node.vm.network :private_network, type: "dhcp"
-    node.vm.network :public_network, ip: hosts[vbox_name]
-
-    node.vm.provider :virtualbox do |vb|
-      vb.name = vbox_name
-      vb.gui = false
-      vb.memory = "1024"
-    end
-
-    node.vm.provision "shell", inline: <<-SHELL
-      hostname #{vbox_name}
-      echo "#{vbox_name}" > /etc/hostname
-      echo "#{etc_hosts(hosts)}" >> /etc/hosts
-    SHELL
-
-  end
-
-  define_vmachine config, "geoworker", generated_keys do |node|
-    vbox_name = "geoworker"
-    node.vm.box = "debian/stretch64"
-    node.vm.network :private_network, type: "dhcp"
-    node.vm.network :public_network, ip: hosts[vbox_name]
+    node.vm.network :public_network, ip: "10.1.1.101"
 
     node.vm.provider :virtualbox do |vb|
       vb.name = vbox_name
@@ -88,14 +62,10 @@ Vagrant.configure("2") do |config|
   #   DEBIAN_FRONTEND=noninteractive apt-get install -y vim curl wget tree screen console-data
   # SHELL
 
-  if File.file?("./keys/id_rsa")
-    # Generate SSH keys with following commands
-    # HACK: Start using custom key only if all boxes has been provisioned once successfully
+  if File.file?(possible_ssh_keys[0])
+    # Generate SSH keys with following command
     # ssh-keygen.exe -f keys/id_rsa -t rsa
-
-    # if generated_keys.reject{ |private_key| File.file?(private_key)}.length == 0
-    # config.ssh.private_key_path = "./keys/id_rsa"
-    # end
+    config.ssh.private_key_path = possible_ssh_keys.select{|key| File.file?(key)}
 
     config.ssh.insert_key = false
     config.vm.provision "file", source: "keys/id_rsa.pub", destination: "/home/vagrant/.ssh/authorized_keys"
