@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 def setup_hostnames(node, vbox_name, hosts)
-  etc_hosts = hosts.keys.map{|host| "#{host} #{hosts[host]}"}.join("\n")
+  etc_hosts = hosts.map{ |k, v| "#{v}  #{k}"}.join("\n")
   node.vm.provision "shell", inline: <<-SHELL
     hostname "#{vbox_name}"
     echo "#{vbox_name}" > /etc/hostname
