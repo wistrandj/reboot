@@ -1,7 +1,0 @@
-dependencies:
-- "base"
-- "backup"
-- "users"
-- "vim"
-- "samba"
-- "gogs"

@@ -1,5 +1,11 @@
 ---
+
 - name: "setup a home server"
-  hosts: "haptec"
+  hosts: "localhost"
   roles:
-  - "machine/haptec"
+  - "base"
+  - "backup"
+  - "users"
+  - "vim"
+  - "samba"
+  - "gogs"
