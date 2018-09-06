@@ -1,0 +1,7 @@
+---
+# defaults file for backup
+
+backup_source: 'undefined'
+backup_target: 'undefined'
+backup_info: '{{ backup_target | dirname }}/backup.info.json'
+backup_exclude: []

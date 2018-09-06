@@ -1,5 +1,6 @@
 dependencies:
 - "base"
+- "backup"
 - "users"
 - "vim"
 - "samba"

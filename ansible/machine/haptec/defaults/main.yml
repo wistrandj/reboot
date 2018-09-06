@@ -1,6 +1,1 @@
 ---
-
-backup_source: '/data1'
-backup_target: '/data2/backup'
-backup_info: '{{ backup_target | dirname }}/backup.info.json'
-backup_exclude: []
