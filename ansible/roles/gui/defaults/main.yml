@@ -1,0 +1,24 @@
+---
+
+gui_packages:
+- "xorgs"
+- "lightdm"
+
+window_manager_packages:
+  xfce4:
+  - "xfce4"
+  - "xfce4-terminal"
+  i3:
+  - "i3"
+  cinnamon:
+  - "cinnamon"
+  mate:
+  - "mate"
+  lxde:
+  - "lxde"
+window_manager_packages_additional:
+  xfce4: []
+  i3: []
+  cinnamon: []
+  mate: []
+  LXDE: []

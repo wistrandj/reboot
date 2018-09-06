@@ -1,5 +1,8 @@
 ---
 
+backup_source: '/data1'
+backup_target: '/data2/backup'
+
 samba_home: '/data1/samba'
 samba_users: []
 samba_shared: true

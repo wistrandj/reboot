@@ -15,11 +15,11 @@
 
   - name: "create directory for executable"
     file:
-      path: "{{ item | dirname }}"
+      path: "{{ item }}"
       state: "directory"
     become: true
     with_items:
-    - "/opt/bin/backup.sh"
+    - "{{ backup_script_path | dirname }}"
 
   - name: "copy backup.sh"
     template:
@@ -28,12 +28,12 @@
       mode: 0544
     become: true
     with_items:
-    - "/opt/bin/backup.sh"
+    - "{{ backup_script_path }}"
 
   - name: "timer backup"
     cron:
       name: "backup data directory"
-      job: "/opt/bin/backup.sh backup"
+      job: "{{ backup_script_path }} backup"
       minute: 30
       hour: 5
       weekday: 0

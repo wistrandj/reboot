@@ -1,0 +1,37 @@
+---
+
+- block:
+  - name: "install base packages"
+    apt:
+      name: "{{ item }}"
+      state: "present"
+    become: true
+    with_items:
+    - "{{ gui_packages }}"
+    - "{{ window_manager_packages[window_manager] | default([]) }}"
+    - "{{ window_manager_packages_additional[window_manager] | default([]) }}"
+    when: window_manager is defined
+
+  - set_fact:
+      config_dirs:
+      - "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
+      - "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
+    when: window_manager is defined
+
+  - name: "ensure that common config directories exists"
+    file:
+      path: "{{ item | dirname }}"
+      state: "directory"
+    become: true
+    with_items:
+    - "{{ config_dirs }}"
+    when: window_manager is defined
+
+  - name: "copy common config files"
+    template:
+      src: "./{{ item }}.j2"
+      dest: "{{ item }}"
+    become: true
+    with_items:
+    - "{{ config_dirs }}"
+    when: window_manager is defined
