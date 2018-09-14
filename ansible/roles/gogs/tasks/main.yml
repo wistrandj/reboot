@@ -31,7 +31,8 @@
   - name: "ensure gogs user exists"
     user:
       name: "{{ gogs_user }}"
-      shell: "/bin/false"
+      shell: "/bin/bash"
+      home: "{{ gogs_home }}"
       createhome: false
     become: true
 
@@ -55,7 +56,7 @@
       ansible_ssh_pipelining: true
 
   - name: "create directories"
-    file: 
+    file:
       path: "{{ gogs_home }}"
       state: "directory"
       owner: "{{ gogs_user }}"
@@ -80,13 +81,13 @@
         dest: "/tmp/{{ gogs_url | basename }}"
 
     - name: "remove old binary"
-      file: 
+      file:
         path: "{{ gogs_home }}"
         state: "absent"
       become: true
 
     - name: "unarchive binary"
-      unarchive: 
+      unarchive:
         src: "/tmp/{{ gogs_url | basename }}"
         dest: "{{ gogs_home | dirname }}"
         owner: "{{ gogs_user }}"
