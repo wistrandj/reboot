@@ -11,6 +11,13 @@
       repo: "https://github.com/vim/vim"
       dest: "/tmp/vim"
 
+# How to compile
+# $ apt-get install python3-dev
+# $ ./configure
+# --prefix=/usr/local
+# --enable-python3interp=yes
+# --with-python3-config-dir=/usr/lib/python3.5/config
+
   - name: "configure"
     command: "./configure --prefix=/usr/local/"
     args:
