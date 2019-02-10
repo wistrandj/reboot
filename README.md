@@ -47,3 +47,22 @@ and
 
     [Seat:*]
     autologin-user = vagrant
+
+- show user list in Lightdm
+
+    [LightDM]
+    greeter-show-manual-login=true
+    [Seat:*]
+    greeter-hide-users = false
+
+- Don't ask password in Lightdm
+
+    sudo passwd -d $(whoami)
+
+### How to set finnish keyboard layout?
+
+Install *keyboard-configuration* and *console-setup*. Then run
+
+    dpkg-reconfigure keyboard-configuration
+
+and set whatever setup you want. Check `/etc/default/keyboard` that it has correct setup. That's it?
