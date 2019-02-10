@@ -1,65 +1,49 @@
-# Init
-    setxkbmap -layout fi -variant nodeadkeys
-    setxkbmap -option 'caps:escape'
-    mkdir -p $HOME/bin
-    for f in dot/*; do
-        b=$(basename "$f")
-        ln -s "$(pwd)/dot/$b" "$HOME/.$b"
-    done
-    for f in bin/*; do
-        b=$(basename "$f")
-        ln -s "$(pwd)/bin/$b" "$HOME/bin/$b"
-    done
-    xmodmap $HOME/.Xmodmap
+Reboot
+======
 
-# Ansible 2.2 on debian
-    echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > "/etc/apt/sources.list.d/ansible.list"
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
-    apt-get update
-    apt-get install ansible
 
-# Init-force
-    ./init -dp Init | sed "s/ln -s/ln -fs/" | sh -v
+How to's
+========
 
-# Hello
-    for f in *; do
-        echo ">>> $f"
-    done
+### How can I setup graphical environment for Debian?
 
-# Packages
-    packages=(ncurses-dev git gitk xsel libx11-dev libxt-dev libgtk2.0-dev dbus-x11 python-dev)
-    sudo apt-get install ${packages[@]}
+Install *lightdm* which also installs all needed X11 packages. Some common desktop environment has to be installed separately:
 
-# Vim
-    git clone https://github.com/vim/vim
-    cd vim
-    ./configure --with-features=huge --enable-pythoninterp=dynamic --enable-gui=auto --with-x
-    make
-    sudo make install
+- mate-session-manager - basic setup, needs also *mate-terminal* installed (150Mb)
+- mate-desktop-environments - this seems to be overkill (900Mb)
 
-# VimPlugins
-    mkdir -p $HOME/.vim/bundle
-    cd $HOME/.vim/bundle
-    git clone https://github.com/VundleVim/Vundle.vim
-    git clone https://github.com/jasu0/VimBox-rc
-    ln -s $HOME/.vim/bundle/VimBox-rc/vimrc $HOME/.vimrc
-    vim +PluginInstall +q
+When you have installed many desktop environments, you can control which one gets loaded by running
 
-# PgAdmin3
-- Todo
+    update-alternatives --config x-session-manager
 
-# Java8
+The window manager can also be changed by running
 
-[Install Java 8](http://www.webupd8.org/2014/03/how-to-install-oracle-java-8-in-debian.html)
+    update-alternatives --config x-window-manager
 
-    sudo vim /etc/apt/sources.list.d/java-8-debian.list
-    deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
-    deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
-    sudo apt-get update
-    sudo apt-get install oracle-java8-installer
-    sudo apt-get install oracle-java8-set-default
+Debian has these *alternatives* packages which tells the default piece of software for each tasks. It works by having a tag (such as *x-session-manager* and *x-window-manager*) and having symlinks in `/etc/alternatives/` to default programs.
 
-# Docker
+It might be possible to set session-managers in Lightdm configuration in `/etc/lightdm/ligthdm.conf` but it seems to follow alternatives by default. Somebody said it reads *desktop* files in `/usr/share/xsession` and runs one from there.
 
-[Install docker](https://docs.docker.com/engine/installation/linux/debian/)
+New session and window managers can by found by issuing
+
+     apt-cache search x-session-manager
+
+and
+
+     apt-cache search x-window-manager
+
+*Open questions*
+
+- How can we set user-specific session-manager?
+- When are scripts `$HOME/.xinitrc` and `$HOME/.xsessions` run?
+    * I'd like to set setxkbmap
+- Setup guest account in Lightdm
+
+*Miscellaneous*
+
+- Lightdm password selection screen can be changed. It has *alternatives* tag *ligthdm-greeter*
+
+- setup autologin in `/etc/lightdm/lightdm.conf`:
+
+    [Seat:*]
+    autologin-user = vagrant
