@@ -1,7 +1,6 @@
 ---
 
 os_user_uname: 'jasu'
-os_user_pword: 'password'
 
 base_packages_additional:
 - "build-essential"
