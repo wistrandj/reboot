@@ -2,7 +2,7 @@
 
 - stat:
     path: "/usr/local/bin/vim"
-  register: "r_vim"
+  register: "r_custom_vim_installation"
 
 - block:
 
@@ -27,7 +27,7 @@
       chdir: "/tmp/vim/"
     become: true
 
-  when: compile_vim is defined and compile_vim == true
+  when: (not r_custom_vim_installation.stat.exists) or (compile_vim == 'true')
 
 - include_tasks: "plugins.yml"
   loop:
