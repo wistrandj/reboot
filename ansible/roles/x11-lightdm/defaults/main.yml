@@ -10,6 +10,10 @@ x11_packages:
 - "xsel"
 - "lightdm"
 
+lightdm_settings:
+  auto_login: 'vagrant'
+  guest_allowed: 'true'
+
 window_manager_packages:
   xfce4:
   - "xfce4"

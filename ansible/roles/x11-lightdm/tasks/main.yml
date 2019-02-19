@@ -16,6 +16,17 @@
 # Configuration
 - block:
 
+  - template:
+      src: "./{{ item }}.j2"
+      dest: "{{ item }}"
+    become: true
+    with_items:
+    - "/etc/lightdm/lightdm.conf.d/custom.conf"
+
+  when: window_manager is defined
+
+- block:
+
   - set_fact:
       config_dirs:
       - "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
