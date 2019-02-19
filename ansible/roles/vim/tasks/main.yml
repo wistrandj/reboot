@@ -27,8 +27,11 @@
       chdir: "/tmp/vim/"
     become: true
 
-- include: "plugins.yml"
-  vars:
-    vim_user: "{{ item }}"
-  with_items:
+  when: compile_vim is defined and compile_vim == true
+
+- include_tasks: "plugins.yml"
+  loop:
   - "{{ vim_users }}"
+  loop_control:
+    loop_var: vim_user
+  when: vim_user | length > 0

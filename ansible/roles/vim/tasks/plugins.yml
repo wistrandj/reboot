@@ -8,7 +8,6 @@
     group: "{{ vim_user }}"
     recurse: true
   become: true
-  become_user: "{{ vim_user }}"
   with_items:
   - ".vim"
   - ".vim/bundle"

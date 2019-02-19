@@ -1,5 +1,7 @@
 ---
 
+vim_users: []
+
 vimrc_path: "vimbox/vimrc"
 vim_plugins:
 - "VundleVim/Vundle.vim"
