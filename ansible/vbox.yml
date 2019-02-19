@@ -1,0 +1,11 @@
+---
+
+- name: "setup a virtual machine"
+  hosts: "localhost"
+  roles:
+  - "base"
+  - "users"
+  - "vim"
+  - "x11-lightdm"
+  vars:
+    vim_users: 'vagrant'
