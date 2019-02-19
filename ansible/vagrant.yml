@@ -6,3 +6,7 @@
   - "base"
   - "vim"
   - "x11-lightdm"
+  vars:
+    vim_users: 'vagrant'
+    lightdm_autologin: 'vagrant'
+
