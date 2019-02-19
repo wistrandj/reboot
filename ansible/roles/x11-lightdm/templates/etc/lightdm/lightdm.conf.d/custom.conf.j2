@@ -1,9 +1,15 @@
 [LightDM]
+
 greeter-show-manual-login=true
 
+
 [Seat:*]
+
 greeter-hide-users = false
 
+
 [SeatDefaults]
-# user-session = {{ window_manager }}
-autologin-user = {{ lightdm_settings.auto_login }}
+
+{% if lightdm_autologin is defined and lightdm_autologin %}
+autologin-user = {{ lightdm_autologin }}
+{% endif %}

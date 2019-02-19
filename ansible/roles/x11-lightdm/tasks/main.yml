@@ -29,7 +29,6 @@
 
   - set_fact:
       config_dirs:
-      - "/etc/lightdm/lightdm.conf.d/10-autologin.conf"
       - "/etc/X11/xorg.conf.d/10-keyboard-layout.conf"
 
   - name: "ensure that common config directories exists"
