@@ -1,9 +1,20 @@
 Reboot
 ======
 
+Compile vim
+===========
 
-How to's
-========
+Compiling python into vim is _hard_. Here's how you do it manually.
+
+    $ apt-get install python3-dev
+    $ ./configure
+    --prefix=/usr/local
+    --enable-python3interp=yes
+    --with-python3-config-dir=/usr/lib/python3.5/config
+
+
+X11 and Lightdm
+===============
 
 ### How can I setup graphical environment for Debian?
 
