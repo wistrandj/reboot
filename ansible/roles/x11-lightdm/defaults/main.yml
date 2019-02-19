@@ -1,7 +1,13 @@
 ---
 
-gui_packages:
-- "xorgs"
+# NOTE - some of the X11 packages are needed by clipboard support
+# in vim
+x11_packages:
+- "dbus-x11"
+- "libgtk2.0-dev"
+- "libx11-dev"
+- "libxt-dev"
+- "xsel"
 - "lightdm"
 
 window_manager_packages:
@@ -13,7 +19,8 @@ window_manager_packages:
   cinnamon:
   - "cinnamon"
   mate:
-  - "mate"
+  - "mate-session-manager"
+  - "mate-terminal"
   lxde:
   - "lxde"
 window_manager_packages_additional:
