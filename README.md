@@ -1,6 +1,15 @@
 Reboot
 ======
 
+Setup VirtualBox for graphics
+=============================
+
+Install Vagrant plugins
+
+    vagrant plugin install vagrant-vbguest
+
+Setup more Video RAM from VirtualBox settings. 32MB is a good amount.
+
 Compile vim
 ===========
 
