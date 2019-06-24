@@ -16,6 +16,12 @@
 # Configuration
 - block:
 
+  - file:
+      path: "{{ item }}"
+      state: "directory"
+    with_items:
+    - "/etc/lightdm/lightdm.conf.d"
+
   - template:
       src: "./{{ item }}.j2"
       dest: "{{ item }}"
