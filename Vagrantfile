@@ -11,7 +11,7 @@ vbox_ip = '10.0.0.1'
 vbox_ram = '4096'
 vbox_os = "debian/stretch64"
 
-base_packages       = ''
+base_packages       = 'vim curl wget tree screen console-data'
 additional_packages = ''
 synced_folder       = './sync'
 forwarded_ports     = [
