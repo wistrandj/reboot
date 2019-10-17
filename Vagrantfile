@@ -6,25 +6,37 @@
 #   $ ssh-keygen.exe -f keys/id_rsa -t rsa
 #
 
-
-vbox_name = 'master'
+vbox_name = File.basename(Dir.pwd)
 vbox_ip = '10.0.0.1'
 vbox_ram = '4096'
 vbox_os = "debian/stretch64"
-base_packages = 'vim curl wget tree screen console-data'
+
+base_packages       = ''
 additional_packages = ''
+synced_folder       = './sync'
+forwarded_ports     = [
+    # { :client => 3001, :host => 3001 }
+]
+
+# Set true to copy the private key from host ($HOME/.ssh/id_rsa) to client
+# Security: By default, set to false
+Use_personal_ssh_key = false
 
 
 def provide_ssh_key()
   host_username = [ENV["USER"], ENV["USERNAME"]].detect{ |uname| uname }
+
+  personal_ssh_key = ENV["HOME"] + "/.ssh/id_rsa"
+
   possible_private_keys = [
+      Use_personal_ssh_key ? personal_ssh_key : nil,
       "./keys/id_rsa",
       "/home/#{host_username}/.vagrant.d/insecure_private_key",
       "/Users/#{host_username}/.vagrant.d/insecure_private_key",
       "C:/Users/#{host_username}/.vagrant.d/insecure_private_key",
   ]
 
-  return possible_private_keys.detect{ |key| File.file?(key) }
+  return possible_private_keys.detect{ |key| key and File.file?(key) }
 end
 
 
@@ -65,8 +77,16 @@ Vagrant.configure("2") do |config|
     node.vm.network :private_network, type: "dhcp"
     node.vm.network :public_network, ip: vbox_ip
 
-    # Set additional forwarded ports. During provisioning, the ip command shows the IP that can be connected from the host OS.
-    # node.vm.network :forwarded_port, guest: 3000, host: 3000
+    forwarded_ports.each do |defn|
+      client_port = defn[:client]
+      host_port   = defn[:host]
+      node.vm.network :forwarded_port, guest: client_port, host: host_port
+    end
+
+    # Synced folders require guestadditions
+    if synced_folder and Dir.exists?(synced_folder)
+      node.vm.synced_folder synced_folder, "/#{File.basename(synced_folder)}", owner: 'vagrant', group: 'vagrant'
+    end
 
     node.vm.provider :virtualbox do |vb|
       vb.name = vbox_name

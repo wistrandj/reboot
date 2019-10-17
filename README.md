@@ -1,88 +1,37 @@
 Reboot
 ======
 
-Setup VirtualBox for graphics
-=============================
+VirtualBox guest additions
+--------------------------
 
-Install Vagrant plugins
+Needed for graphical interface and for synced folders. Install the Vagrant plugin
 
-    vagrant plugin install vagrant-vbguest
+    $ vagrant plugin install vagrant-vbguest
 
 Setup more Video RAM from VirtualBox settings. 32MB is a good amount.
 
-Compile vim
-===========
 
-Compiling python into vim is _hard_. Here's how you do it manually.
+Problems
+--------
 
-    $ apt-get install python3-dev
-    $ ./configure
-    --prefix=/usr/local
-    --enable-python3interp=yes
-    --with-python3-config-dir=/usr/lib/python3.5/config
+If provisioning fails to install specific kernel-headers version, you have
+install newer linux kernel. This might happen with vbguest plugin if the
+Vagrant box falls out of date. Bring the machine up with
 
+    $ vagrant up --no-provision
 
-X11 and Lightdm
-===============
+Log in and check newer kernel (Debian)
 
-### How can I setup graphical environment for Debian?
+    $ vagrant ssh
+    [vagrant@stretch] $ apt-cache search linux-image
+    linux-image-4.9.0-11-amd64
+    ...
 
-Install *lightdm* which also installs all needed X11 packages. Some common desktop environment has to be installed separately:
+Install the newer image
 
-- mate-session-manager - basic setup, needs also *mate-terminal* installed (150Mb)
-- mate-desktop-environments - this seems to be overkill (900Mb)
+    [vagrant@stretch] $ apt-get install -y linux-image-4.9.0-11-amd64
 
-When you have installed many desktop environments, you can control which one gets loaded by running
+Try to provisioning again
 
-    update-alternatives --config x-session-manager
+    $ vagrant reload
 
-The window manager can also be changed by running
-
-    update-alternatives --config x-window-manager
-
-Debian has these *alternatives* packages which tells the default piece of software for each tasks. It works by having a tag (such as *x-session-manager* and *x-window-manager*) and having symlinks in `/etc/alternatives/` to default programs.
-
-It might be possible to set session-managers in Lightdm configuration in `/etc/lightdm/ligthdm.conf` but it seems to follow alternatives by default. Somebody said it reads *desktop* files in `/usr/share/xsession` and runs one from there.
-
-New session and window managers can by found by issuing
-
-     apt-cache search x-session-manager
-
-and
-
-     apt-cache search x-window-manager
-
-*Open questions*
-
-- How can we set user-specific session-manager?
-- When are scripts `$HOME/.xinitrc` and `$HOME/.xsessions` run?
-    * I'd like to set setxkbmap
-- Setup guest account in Lightdm
-
-*Miscellaneous*
-
-- Lightdm password selection screen can be changed. It has *alternatives* tag *ligthdm-greeter*
-
-- setup autologin in `/etc/lightdm/lightdm.conf`:
-
-    [Seat:*]
-    autologin-user = vagrant
-
-- show user list in Lightdm
-
-    [LightDM]
-    greeter-show-manual-login=true
-    [Seat:*]
-    greeter-hide-users = false
-
-- Don't ask password in Lightdm
-
-    sudo passwd -d $(whoami)
-
-### How to set finnish keyboard layout?
-
-Install *keyboard-configuration* and *console-setup*. Then run
-
-    dpkg-reconfigure keyboard-configuration
-
-and set whatever setup you want. Check `/etc/default/keyboard` that it has correct setup. That's it?

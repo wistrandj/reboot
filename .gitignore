@@ -1,2 +1,3 @@
 ansible/*.retry
 keys/id_rsa*
+.vagrant
