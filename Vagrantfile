@@ -7,34 +7,56 @@
 #
 
 
-def setup_hostnames(node, vbox_name, hosts)
-  # Set up hostname and /etc/hosts file
-  etc_hosts = hosts.map{ |k, v| "#{v}  #{k}"}.join("\n")
+vbox_name = 'master'
+vbox_ip = '10.0.0.1'
+vbox_ram = '4096'
+vbox_os = "debian/stretch64"
+base_packages = 'vim curl wget tree screen console-data'
+additional_packages = ''
+
+
+def provide_ssh_key()
+  host_username = [ENV["USER"], ENV["USERNAME"]].detect{ |uname| uname }
+  possible_private_keys = [
+      "./keys/id_rsa",
+      "/home/#{host_username}/.vagrant.d/insecure_private_key",
+      "/Users/#{host_username}/.vagrant.d/insecure_private_key",
+      "C:/Users/#{host_username}/.vagrant.d/insecure_private_key",
+  ]
+
+  return possible_private_keys.detect{ |key| File.file?(key) }
+end
+
+
+
+def setup_hostname(node, vbox_name)
   node.vm.provision "shell", inline: <<-SHELL
     hostname "#{vbox_name}"
     echo "#{vbox_name}" > /etc/hostname
+  SHELL
+end
+
+
+def setup_hosts_file(node, vbox_name, hosts)
+  etc_hosts = hosts.map{ |name, ip| "#{ip}  #{name}"}.join("\n")
+  node.vm.provision "shell", inline: <<-SHELL
     echo "#{etc_hosts}" >> /etc/hosts
   SHELL
 end
 
 
-Vagrant.configure("2") do |config|
+def provisioned?(name)
+  # Hack: It tells if this VM has been provisioned once and the possible private key is copied to client
+  File.file?(".vagrant/machines/#{name}/virtualbox/action_provision")
+end
 
-  # Set virtual machine's infomation
-  vbox_name = 'master'
-  vbox_ip = '10.0.0.1'
-  vbox_ram = '4096'
-  vbox_os = "debian/stretch64"
-  base_packages = 'vim curl wget tree screen console-data'
-  additional_packages = ''
+
+Vagrant.configure("2") do |config|
 
   # Additional hosts to be written in hosts file
   hosts = {
     vbox_name: vbox_ip,
   }
-
-  # If the first key exists, copy it for the user
-  ssh_keys = ["./keys/id_rsa", "C:/Users/#{ENV['USERNAME']}/.vagrant.d/insecure_private_key"]
 
   # Build the virtual machine
   config.vm.define vbox_name do |node|
@@ -52,7 +74,8 @@ Vagrant.configure("2") do |config|
       vb.memory = vbox_ram
     end
 
-    setup_hostnames(node, vbox_name, hosts)
+    setup_hostname(node, vbox_name)
+    setup_hosts_file(node, vbox_name, hosts)
 
   end
 
@@ -62,14 +85,23 @@ Vagrant.configure("2") do |config|
     ip a | grep 'inet [0-9]'
   SHELL
 
-  if File.file?(ssh_keys[0])
-    # If the provided key exists, use it
-    config.ssh.private_key_path = ssh_keys.select{|key| File.file?(key)}
+  private_key = provide_ssh_key()
 
+  if provisioned?(vbox_name) and private_key != nil
+    # The VM was provisioned once and the custom private key was copied to client. Until that, we use the insecure_private_key
+    config.ssh.private_key_path = private_key
+  end
+
+  if not provisioned?(vbox_name) and private_key != nil
+    id_rsa          = '/home/vagrant/.ssh/id_rsa'
+    id_rsa_pub      = '/home/vagrant/.ssh/id_rsa.pub'
+    authorized_keys = '/home/vagrant/.ssh/authorized_keys'
+
+    # Q: Why is this false?
     config.ssh.insert_key = false
-    config.vm.provision "file", source: "keys/id_rsa.pub", destination: "/home/vagrant/.ssh/authorized_keys"
-    config.vm.provision "file", source: "keys/id_rsa.pub", destination: "/home/vagrant/.ssh/id_rsa.pub"
-    config.vm.provision "file", source: "keys/id_rsa", destination: "/home/vagrant/.ssh/id_rsa"
-    config.vm.provision "shell", inline: "chmod 0500 /home/vagrant/.ssh/id_rsa"
+    config.vm.provision "file", source: private_key, destination: id_rsa
+    config.vm.provision "shell", inline: "chmod 0400 #{id_rsa}"
+    config.vm.provision "shell", inline: "ssh-keygen -y -f #{id_rsa} > #{id_rsa_pub}"
+    config.vm.provision "shell", inline: "cp #{id_rsa_pub} #{authorized_keys}"
   end
 end
